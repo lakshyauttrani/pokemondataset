@@ -21,8 +21,8 @@ import random
 # Add a dark mode slider button
 
 
-df = pd.read_csv("/Users/ksmaurya/Documents/AnalyticonViz/pokedex_input.csv")
-df2 = pd.read_csv("/Users/ksmaurya/Documents/AnalyticonViz/revenue.csv", sep=';')
+df = pd.read_csv("pokedex_input.csv")
+df2 = pd.read_csv("revenue.csv", sep=';')
 
 df.drop(columns=['Unnamed: 0','german_name','japanese_name'],inplace=True)
 df['catch_label'] = pd.qcut(df['catch_rate'], 4, labels=['You Got Lucky', 'Super Hard', 'Caught It', 'Meh'], retbins=False, precision=3, duplicates='raise')
@@ -245,7 +245,7 @@ with row0_1:
     )
 
 # Button Image
-button_image_path = "/Users/ksmaurya/Documents/AnalyticonViz/comp_code/Battle_groud.webp"
+button_image_path = "comp_code/Battle_groud.webp"
 button_image = Image.open(button_image_path)
 # Reduce the image size to improve loading time
 button_image.thumbnail((200, 200))  # Adjust the size as needed
@@ -253,7 +253,7 @@ button_image.thumbnail((200, 200))  # Adjust the size as needed
 # Button to open the new Streamlit page
 with row0_2:
     if st.image(button_image, use_column_width=True, caption="Click to enter the battle ground"):
-        link = "http://localhost:8501/Users/ksmaurya/Documents/AnalyticonViz/comp_code/pokeviz2.py"
+        link = "http://localhost:8501comp_code/pokeviz2.py"
         # Use Markdown to create a hyperlink to the new Streamlit app
 
 
@@ -690,7 +690,7 @@ with tab5:
 
     with bg_1_2:
         # Load the button image
-        button_image_path = "/Users/ksmaurya/Documents/AnalyticonViz/comp_code/Poke_Ball.webp"
+        button_image_path = "comp_code/Poke_Ball.webp"
         button_image = Image.open(button_image_path)
         # Reduce the image size to improve loading time
         button_image.thumbnail((180, 200))  # Adjust the size as needed
