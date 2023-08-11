@@ -174,58 +174,58 @@ def create_violin_plot(df, stat, best_type):
 st.set_page_config(page_title="PokeViz App", layout="wide")
 
 
-dark_mode = st.sidebar.checkbox("Dark Mode")
-
-# Set the theme based on the dark mode status
-dark = """
-<style>
-    .stApp {
-        background-color: black;
-        color: white; /* Change font color to white in dark mode */
-    }
-    .stTab {
-        color: white; /* Change tab color to white in dark mode */
-    }
-</style>
-"""
-
-light = """
-<style>
-    .stApp {
-        background-color: white;
-        color: black; /* Change font color to black in light mode */
-    }
-    .stTab {
-        color: black; /* Change tab color to black in light mode */
-    }
-</style>
-"""
-
-st.markdown(light, unsafe_allow_html=True)
-
-# Create a toggle button
-toggle = st.button("Toggle theme")
-
-# Use a global variable to store the current theme
-if "theme" not in st.session_state:
-    st.session_state.theme = "light"
-
-# Change the theme based on the button state
-if toggle:
-    if st.session_state.theme == "light":
-        st.session_state.theme = "dark"
-    else:
-        st.session_state.theme = "light"
-
-# Apply the theme to the app
-if st.session_state.theme == "dark":
-    st.markdown(dark, unsafe_allow_html=True)
-else:
-    st.markdown(light, unsafe_allow_html=True)
-
-# Display some text
-st.write("This is a streamlit app with a toggle button for themes.")
-
+# dark_mode = st.sidebar.checkbox("Dark Mode")
+# 
+# # Set the theme based on the dark mode status
+# dark = """
+# <style>
+#     .stApp {
+#         background-color: black;
+#         color: white; /* Change font color to white in dark mode */
+#     }
+#     .stTab {
+#         color: white; /* Change tab color to white in dark mode */
+#     }
+# </style>
+# """
+# 
+# light = """
+# <style>
+#     .stApp {
+#         background-color: white;
+#         color: black; /* Change font color to black in light mode */
+#     }
+#     .stTab {
+#         color: black; /* Change tab color to black in light mode */
+#     }
+# </style>
+# """
+# 
+# st.markdown(light, unsafe_allow_html=True)
+# 
+# # Create a toggle button
+# toggle = st.button("Toggle theme")
+# 
+# # Use a global variable to store the current theme
+# if "theme" not in st.session_state:
+#     st.session_state.theme = "light"
+# 
+# # Change the theme based on the button state
+# if toggle:
+#     if st.session_state.theme == "light":
+#         st.session_state.theme = "dark"
+#     else:
+#         st.session_state.theme = "light"
+# 
+# # Apply the theme to the app
+# if st.session_state.theme == "dark":
+#     st.markdown(dark, unsafe_allow_html=True)
+# else:
+#     st.markdown(light, unsafe_allow_html=True)
+# 
+# # Display some text
+# st.write("This is a streamlit app with a toggle button for themes.")
+# 
 
 
 #Header
@@ -245,7 +245,7 @@ with row0_1:
     )
 
 # Button Image
-button_image_path = "/Users/ksmaurya/Documents/AnalyticonViz/comp_code/Battle_groud.webp"
+button_image_path = "Battle_groud.webp"
 button_image = Image.open(button_image_path)
 # Reduce the image size to improve loading time
 button_image.thumbnail((200, 200))  # Adjust the size as needed
@@ -253,7 +253,7 @@ button_image.thumbnail((200, 200))  # Adjust the size as needed
 # Button to open the new Streamlit page
 with row0_2:
     if st.image(button_image, use_column_width=True, caption="Click to enter the battle ground"):
-        link = "http://localhost:8501/Users/ksmaurya/Documents/AnalyticonViz/comp_code/pokeviz2.py"
+        link = "pokeviz2.py"
         # Use Markdown to create a hyperlink to the new Streamlit app
 
 
@@ -690,7 +690,7 @@ with tab5:
 
     with bg_1_2:
         # Load the button image
-        button_image_path = "/Users/ksmaurya/Documents/AnalyticonViz/comp_code/Poke_Ball.webp"
+        button_image_path = "Poke_Ball.webp"
         button_image = Image.open(button_image_path)
         # Reduce the image size to improve loading time
         button_image.thumbnail((180, 200))  # Adjust the size as needed
@@ -723,3 +723,76 @@ with tab5:
                 else:
                     st.markdown("\nIt's a tie!")
 
+with tab3:
+    # Introduction
+    st.write(
+        "Dive into the fascinating world of Pokémon types and unravel their hidden strengths and strategies. "
+        "Let's journey together to explore the intricate relationships among different types."
+    )
+
+    # Graph layout customization
+    fig_layout = dict(
+        margin=dict(l=0, r=0, t=40, b=40),
+        legend=dict(orientation="h", yanchor="bottom", y=-0.2, xanchor="center", x=0.5),
+    )
+
+    # Graph 1 & 2 side by side
+    st.header("Graph 1: Enigmatic Type Distribution")
+    col1, col2 = st.columns(2)
+
+    # Graph 1: Distribution of Pokémon Types
+    type_counts = df['type_1'].value_counts().sort_values(ascending=False)
+    fig1 = px.bar(x=type_counts.index, y=type_counts.values, labels={'x': 'Type', 'y': 'Count'})
+    fig1.update_layout(**fig_layout)
+    col1.plotly_chart(fig1)
+    st.write("Unveil the frequencies of different Pokémon types.")
+
+    # Graph 2: Type Effectiveness Heatmap
+    type_cols = ['against_bug', 'against_dark', 'against_dragon', 'against_electric', 'against_fairy']
+    type_effectiveness = df[type_cols]
+    fig2 = px.imshow(type_effectiveness.corr(), labels=dict(x="Type", y="Type"))
+    fig2.update_layout(**fig_layout)
+    col2.plotly_chart(fig2)
+    st.write("Decode the intricate web of type effectiveness correlations.")
+
+    # Explanation for Graphs 1 & 2
+    st.write(
+        "Graph 1: Discover the prevalence of each type among Pokémon species. For example, Fire and Water types "
+        "are frequent, while Ghost and Bug types are less common."
+    )
+    st.write(
+        "Graph 2: Unravel the secret ties between type effectiveness. Higher correlations indicate stronger type interactions. "
+        "For instance, Fighting types are effective against Normal types, which is evident from the high correlation."
+    )
+
+    # Graph 3: Elemental Power Showcase
+    st.header("Graph 3: Elemental Power Showcase")
+    avg_stats_by_type = df.groupby('type_1')[['hp', 'attack', 'defense', 'sp_attack', 'sp_defense', 'speed']].mean()
+    avg_stats_by_type = avg_stats_by_type.sort_values(by='attack', ascending=False)
+    fig3 = px.bar(avg_stats_by_type, labels=dict(type_1="Type", value="Average Stat"),
+                  title="Unveil Elemental Powers: Average Base Stats by Type")
+    fig3.update_layout(**fig_layout)
+    st.plotly_chart(fig3)
+    st.write(
+        "Graph 3: Delve into the elemental prowess of each type. For example, the Attack of Fighting and Dragon types "
+        "is generally higher compared to other types."
+    )
+
+    # Graph 4: Dual-Type Marvels
+    st.header("Graph 4: Dual-Type Marvels")
+    type_combinations = df.groupby(['type_1', 'type_2']).size().reset_index(name='count')
+    fig4 = px.scatter(type_combinations, x='type_1', y='type_2', size='count',
+                      labels=dict(type_1="Primary Type", type_2="Secondary Type", count="Count"))
+    fig4.update_layout(**fig_layout)
+    st.plotly_chart(fig4)
+    st.write(
+        "Graph 4: Embark on an exploration of dual-type Pokémon. This scatter plot reveals various combinations, "
+        "like Water-Flying and Grass-Poison types, showcasing the diversity of type interactions."
+    )
+
+    # Conclusion
+    st.header("Conclusion")
+    st.write(
+        "By immersing ourselves in these visualizations, we uncover the tapestry of Pokémon types. The interplay between "
+        "types, their frequencies, effectiveness, strengths, and partnerships, weave a captivating narrative of battles and strategy."
+    )
