@@ -261,13 +261,7 @@ with row0_2:
 
 line1_spacer1, line1_1, line1_spacer2 = st.columns((0.1, 3.2, 0.1))
 
-user_name = "Test_Krishna"
-with line1_1:
-    st.header("Analyzing the Data for: **{}**".format(user_name))
-
-
-
-tab1, tab2, tab3, tab4, tab5 = st.tabs(["Main", "Explore your Pokemon", "EDA-1", "EDA-2", "Battle Ground"])
+tab1, tab2, tab3, tab4 = st.tabs(["Main", "Explore your Pokemon", "EDA-1", "EDA-2"])
 with tab1:
     row1_space1, row_1_1, row1_space2, row_1_2, row3_space3 = st.columns(
         (0.1, 1, 0.1, 1, 0.1)
@@ -491,237 +485,237 @@ with tab2:
     else:
         st.warning("Pokemon not found in the API.")
 
-with tab5:
-    bg_space1, bg_1_1, bg_space2, bg_1_2, bg_space3, bg_1_3 = st.columns(
-        (0.1, 1, 0.1, 0.4, 0.1, 1)
-    )
+# with tab5:
+#     bg_space1, bg_1_1, bg_space2, bg_1_2, bg_space3, bg_1_3 = st.columns(
+#         (0.1, 1, 0.1, 0.4, 0.1, 1)
+#     )
 
-    contender1 = ''
-    contender2 = ''
+#     contender1 = ''
+#     contender2 = ''
 
-    with bg_1_1:
-        # Create two columns for filters
-        bgr_column1, bgr_column2, bgr_column3, bgr_column4 = st.columns(4)
+#     with bg_1_1:
+#         # Create two columns for filters
+#         bgr_column1, bgr_column2, bgr_column3, bgr_column4 = st.columns(4)
 
-        # Filter by Generation
-        selected_generation = bgr_column1.selectbox("Generation", df["generation"].unique(),
-                                                    key="generation")
+#         # Filter by Generation
+#         selected_generation = bgr_column1.selectbox("Generation", df["generation"].unique(),
+#                                                     key="generation")
 
-        # Filter by Type based on selected Generation
-        filtered_df_by_generation = df[df["generation"] == selected_generation]
-        selected_status = bgr_column2.selectbox("Select Status", filtered_df_by_generation["status"].unique(),
-                                                key="status")
+#         # Filter by Type based on selected Generation
+#         filtered_df_by_generation = df[df["generation"] == selected_generation]
+#         selected_status = bgr_column2.selectbox("Select Status", filtered_df_by_generation["status"].unique(),
+#                                                 key="status")
 
-        # Filter by Type based on selected Generation
-        filtered_df_by_generation = df[df["status"] == selected_status]
-        selected_type = bgr_column3.selectbox("Select a Type", filtered_df_by_generation["type_1"].unique(),
-                                              key="type")
+#         # Filter by Type based on selected Generation
+#         filtered_df_by_generation = df[df["status"] == selected_status]
+#         selected_type = bgr_column3.selectbox("Select a Type", filtered_df_by_generation["type_1"].unique(),
+#                                               key="type")
 
-        # Filter by Name based on selected Generation and Type
-        filtered_df_by_type = filtered_df_by_generation[filtered_df_by_generation["type_1"] == selected_type]
-        selected_pokemon = bgr_column4.selectbox("Select a Pokemon", filtered_df_by_type["name"], key="pokemon")
-        contender1 = selected_pokemon
+#         # Filter by Name based on selected Generation and Type
+#         filtered_df_by_type = filtered_df_by_generation[filtered_df_by_generation["type_1"] == selected_type]
+#         selected_pokemon = bgr_column4.selectbox("Select a Pokemon", filtered_df_by_type["name"], key="pokemon")
+#         contender1 = selected_pokemon
 
-        # Fetch the Pokemon data from the API
-        pokeapi_url = f"https://pokeapi.co/api/v2/pokemon/{selected_pokemon.lower()}"
-        response = requests.get(pokeapi_url)
+#         # Fetch the Pokemon data from the API
+#         pokeapi_url = f"https://pokeapi.co/api/v2/pokemon/{selected_pokemon.lower()}"
+#         response = requests.get(pokeapi_url)
 
-        if response.status_code == 200:
-            pokemon_data = response.json()
-            # Use PokeSprites API for higher resolution images
-            pokemon_image_url = f"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/{pokemon_data['id']}.png"
-            pokemon_name = pokemon_data["name"]
+#         if response.status_code == 200:
+#             pokemon_data = response.json()
+#             # Use PokeSprites API for higher resolution images
+#             pokemon_image_url = f"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/{pokemon_data['id']}.png"
+#             pokemon_name = pokemon_data["name"]
 
-            # Display the Pokemon image and stats
-            # image_column, stats_column, image_column = st.columns((1, 2))
+#             # Display the Pokemon image and stats
+#             # image_column, stats_column, image_column = st.columns((1, 2))
 
-            # Check if the higher resolution image is available
-            response_image_high_res = requests.get(pokemon_image_url)
-            if response_image_high_res.status_code == 200:
-                # with image_column:
-                st.markdown(f"<h1 style='text-align: center;'>{pokemon_name.upper()}</h1>", unsafe_allow_html=True)
-                image = Image.open(BytesIO(response_image_high_res.content))
-                st.image(image, use_column_width=True)
-            else:
-                # If higher resolution image is not available, use the other API with lower resolution
-                pokemon_image_url_low_res = pokemon_data["sprites"]["front_default"]
-                # with image_column:
-                st.markdown(f"<h1 style='text-align: center;'>{pokemon_name.upper()}</h1>", unsafe_allow_html=True)
-                response_image_low_res = requests.get(pokemon_image_url_low_res)
-                image_low_res = Image.open(BytesIO(response_image_low_res.content))
-                st.image(image_low_res, use_column_width=True, caption="Sorry for the image quality")
+#             # Check if the higher resolution image is available
+#             response_image_high_res = requests.get(pokemon_image_url)
+#             if response_image_high_res.status_code == 200:
+#                 # with image_column:
+#                 st.markdown(f"<h1 style='text-align: center;'>{pokemon_name.upper()}</h1>", unsafe_allow_html=True)
+#                 image = Image.open(BytesIO(response_image_high_res.content))
+#                 st.image(image, use_column_width=True)
+#             else:
+#                 # If higher resolution image is not available, use the other API with lower resolution
+#                 pokemon_image_url_low_res = pokemon_data["sprites"]["front_default"]
+#                 # with image_column:
+#                 st.markdown(f"<h1 style='text-align: center;'>{pokemon_name.upper()}</h1>", unsafe_allow_html=True)
+#                 response_image_low_res = requests.get(pokemon_image_url_low_res)
+#                 image_low_res = Image.open(BytesIO(response_image_low_res.content))
+#                 st.image(image_low_res, use_column_width=True, caption="Sorry for the image quality")
 
-            stats = {
-                "Name": pokemon_name,
-                "Generation": df.loc[df["name"] == selected_pokemon, "generation"].values[0],
-                "Type": df.loc[df["name"] == selected_pokemon, "type_1"].values[0],
-                "Attack": pokemon_data["stats"][4]["base_stat"],
-                "Defense": pokemon_data["stats"][3]["base_stat"],
-                "Total Points": sum(stat["base_stat"] for stat in pokemon_data["stats"]),
-                "Catch Rate": df.loc[df["name"] == selected_pokemon, "catch_rate"].values[0],
-            }
-            # Convert the stats dictionary to a DataFrame with two columns
-            stats_df = pd.DataFrame.from_dict(stats, orient='index', columns=["Value"])
-            # Adjust the table size to make it slimmer and remove the header row
-            st.table(stats_df.style.set_table_styles([
-                dict(selector="thead", props=[("display", "none")]),
-                dict(selector="th", props=[("max-width", "30px")]),
-                dict(selector="td", props=[("padding", "2px")])  # Increase row spacing
+#             stats = {
+#                 "Name": pokemon_name,
+#                 "Generation": df.loc[df["name"] == selected_pokemon, "generation"].values[0],
+#                 "Type": df.loc[df["name"] == selected_pokemon, "type_1"].values[0],
+#                 "Attack": pokemon_data["stats"][4]["base_stat"],
+#                 "Defense": pokemon_data["stats"][3]["base_stat"],
+#                 "Total Points": sum(stat["base_stat"] for stat in pokemon_data["stats"]),
+#                 "Catch Rate": df.loc[df["name"] == selected_pokemon, "catch_rate"].values[0],
+#             }
+#             # Convert the stats dictionary to a DataFrame with two columns
+#             stats_df = pd.DataFrame.from_dict(stats, orient='index', columns=["Value"])
+#             # Adjust the table size to make it slimmer and remove the header row
+#             st.table(stats_df.style.set_table_styles([
+#                 dict(selector="thead", props=[("display", "none")]),
+#                 dict(selector="th", props=[("max-width", "30px")]),
+#                 dict(selector="td", props=[("padding", "2px")])  # Increase row spacing
 
-            ]))
-            st.markdown(catch_rate_phrase(pokemon_name))
+#             ]))
+#             st.markdown(catch_rate_phrase(pokemon_name))
 
-        else:
-            st.warning("Pokemon not found in the API.")
-            st.text("Just Enjoy some stats of this pokemon.")
-            stats = {
-                "Name": pokemon_name,
-                "Generation": df.loc[df["name"] == selected_pokemon, "generation"].values[0],
-                "Type": df.loc[df["name"] == selected_pokemon, "type_1"].values[0],
-                "Attack": pokemon_data["stats"][4]["base_stat"],
-                "Defense": pokemon_data["stats"][3]["base_stat"],
-                "Total Points": sum(stat["base_stat"] for stat in pokemon_data["stats"]),
-                "Catch Rate": df.loc[df["name"] == selected_pokemon, "catch_rate"].values[0],
-            }
-            # Convert the stats dictionary to a DataFrame with two columns
-            stats_df = pd.DataFrame.from_dict(stats, orient='index', columns=["Value"])
-            # Adjust the table size to make it slimmer and remove the header row
-            st.table(stats_df.style.set_table_styles([
-                dict(selector="thead", props=[("display", "none")]),
-                dict(selector="th", props=[("max-width", "15px")]),
-                dict(selector="td", props=[("padding", "2px")])  # Increase row spacing
+#         else:
+#             st.warning("Pokemon not found in the API.")
+#             st.text("Just Enjoy some stats of this pokemon.")
+#             stats = {
+#                 "Name": pokemon_name,
+#                 "Generation": df.loc[df["name"] == selected_pokemon, "generation"].values[0],
+#                 "Type": df.loc[df["name"] == selected_pokemon, "type_1"].values[0],
+#                 "Attack": pokemon_data["stats"][4]["base_stat"],
+#                 "Defense": pokemon_data["stats"][3]["base_stat"],
+#                 "Total Points": sum(stat["base_stat"] for stat in pokemon_data["stats"]),
+#                 "Catch Rate": df.loc[df["name"] == selected_pokemon, "catch_rate"].values[0],
+#             }
+#             # Convert the stats dictionary to a DataFrame with two columns
+#             stats_df = pd.DataFrame.from_dict(stats, orient='index', columns=["Value"])
+#             # Adjust the table size to make it slimmer and remove the header row
+#             st.table(stats_df.style.set_table_styles([
+#                 dict(selector="thead", props=[("display", "none")]),
+#                 dict(selector="th", props=[("max-width", "15px")]),
+#                 dict(selector="td", props=[("padding", "2px")])  # Increase row spacing
 
-            ]))
-            st.markdown(catch_rate_phrase(pokemon_name))
+#             ]))
+#             st.markdown(catch_rate_phrase(pokemon_name))
 
-    with bg_1_3:
-        # Create two columns for filters
-        bgr_column1, bgr_column2, bgr_column3, bgr_column4 = st.columns(4)
+#     with bg_1_3:
+#         # Create two columns for filters
+#         bgr_column1, bgr_column2, bgr_column3, bgr_column4 = st.columns(4)
 
-        # Filter by Generation
-        selected_generation = bgr_column1.selectbox("Generation", df["generation"].unique(),
-                                                    key="generation_select")
+#         # Filter by Generation
+#         selected_generation = bgr_column1.selectbox("Generation", df["generation"].unique(),
+#                                                     key="generation_select")
 
-        # Filter by Type based on selected Generation
-        filtered_df_by_generation = df[df["generation"] == selected_generation]
-        selected_status = bgr_column2.selectbox("Select Status", filtered_df_by_generation["status"].unique(),
-                                                key="status_select")
+#         # Filter by Type based on selected Generation
+#         filtered_df_by_generation = df[df["generation"] == selected_generation]
+#         selected_status = bgr_column2.selectbox("Select Status", filtered_df_by_generation["status"].unique(),
+#                                                 key="status_select")
 
-        # Filter by Type based on selected Generation
-        filtered_df_by_generation = df[df["status"] == selected_status]
-        selected_type = bgr_column3.selectbox("Select a Type", filtered_df_by_generation["type_1"].unique(),
-                                              key="type_select")
+#         # Filter by Type based on selected Generation
+#         filtered_df_by_generation = df[df["status"] == selected_status]
+#         selected_type = bgr_column3.selectbox("Select a Type", filtered_df_by_generation["type_1"].unique(),
+#                                               key="type_select")
 
-        # Filter by Name based on selected Generation and Type
-        filtered_df_by_type = filtered_df_by_generation[filtered_df_by_generation["type_1"] == selected_type]
-        selected_pokemon = bgr_column4.selectbox("Select a Pokemon", filtered_df_by_type["name"], key="pokemon_select")
-        contender2 = selected_pokemon
+#         # Filter by Name based on selected Generation and Type
+#         filtered_df_by_type = filtered_df_by_generation[filtered_df_by_generation["type_1"] == selected_type]
+#         selected_pokemon = bgr_column4.selectbox("Select a Pokemon", filtered_df_by_type["name"], key="pokemon_select")
+#         contender2 = selected_pokemon
 
-        # Fetch the Pokemon data from the API
-        pokeapi_url = f"https://pokeapi.co/api/v2/pokemon/{selected_pokemon.lower()}"
-        response = requests.get(pokeapi_url)
-        if response.status_code == 200:
-            pokemon_data = response.json()
-            # Use PokeSprites API for higher resolution images
-            pokemon_image_url = f"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/{pokemon_data['id']}.png"
-            pokemon_name = pokemon_data["name"]
+#         # Fetch the Pokemon data from the API
+#         pokeapi_url = f"https://pokeapi.co/api/v2/pokemon/{selected_pokemon.lower()}"
+#         response = requests.get(pokeapi_url)
+#         if response.status_code == 200:
+#             pokemon_data = response.json()
+#             # Use PokeSprites API for higher resolution images
+#             pokemon_image_url = f"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/{pokemon_data['id']}.png"
+#             pokemon_name = pokemon_data["name"]
 
-            # Display the Pokemon image and stats
-            # image_column, stats_column, image_column = st.columns((1, 2))
+#             # Display the Pokemon image and stats
+#             # image_column, stats_column, image_column = st.columns((1, 2))
 
-            # Check if the higher resolution image is available
-            response_image_high_res = requests.get(pokemon_image_url)
-            if response_image_high_res.status_code == 200:
-                # with image_column:
-                st.markdown(f"<h1 style='text-align: center;'>{pokemon_name.upper()}</h1>", unsafe_allow_html=True)
-                image = Image.open(BytesIO(response_image_high_res.content))
-                st.image(image, use_column_width=True)
-            else:
-                # If higher resolution image is not available, use the other API with lower resolution
-                pokemon_image_url_low_res = pokemon_data["sprites"]["front_default"]
-                # with image_column:
-                st.markdown(f"<h1 style='text-align: center;'>{pokemon_name.upper()}</h1>", unsafe_allow_html=True)
-                response_image_low_res = requests.get(pokemon_image_url_low_res)
-                image_low_res = Image.open(BytesIO(response_image_low_res.content))
-                st.image(image_low_res, use_column_width=True, caption="Sorry for the image quality")
+#             # Check if the higher resolution image is available
+#             response_image_high_res = requests.get(pokemon_image_url)
+#             if response_image_high_res.status_code == 200:
+#                 # with image_column:
+#                 st.markdown(f"<h1 style='text-align: center;'>{pokemon_name.upper()}</h1>", unsafe_allow_html=True)
+#                 image = Image.open(BytesIO(response_image_high_res.content))
+#                 st.image(image, use_column_width=True)
+#             else:
+#                 # If higher resolution image is not available, use the other API with lower resolution
+#                 pokemon_image_url_low_res = pokemon_data["sprites"]["front_default"]
+#                 # with image_column:
+#                 st.markdown(f"<h1 style='text-align: center;'>{pokemon_name.upper()}</h1>", unsafe_allow_html=True)
+#                 response_image_low_res = requests.get(pokemon_image_url_low_res)
+#                 image_low_res = Image.open(BytesIO(response_image_low_res.content))
+#                 st.image(image_low_res, use_column_width=True, caption="Sorry for the image quality")
 
-            stats = {
-                "Name": pokemon_name,
-                "Generation": df.loc[df["name"] == selected_pokemon, "generation"].values[0],
-                "Type": df.loc[df["name"] == selected_pokemon, "type_1"].values[0],
-                "Attack": pokemon_data["stats"][4]["base_stat"],
-                "Defense": pokemon_data["stats"][3]["base_stat"],
-                "Total Points": sum(stat["base_stat"] for stat in pokemon_data["stats"]),
-                "Catch Rate": df.loc[df["name"] == selected_pokemon, "catch_rate"].values[0],
-            }
-            # Convert the stats dictionary to a DataFrame with two columns
-            stats_df = pd.DataFrame.from_dict(stats, orient='index', columns=["Value"])
-            # Adjust the table size to make it slimmer and remove the header row
-            st.table(stats_df.style.set_table_styles([
-                dict(selector="thead", props=[("display", "none")]),
-                dict(selector="th", props=[("max-width", "15px")]),
-                dict(selector="td", props=[("padding", "2px")])  # Increase row spacing
+#             stats = {
+#                 "Name": pokemon_name,
+#                 "Generation": df.loc[df["name"] == selected_pokemon, "generation"].values[0],
+#                 "Type": df.loc[df["name"] == selected_pokemon, "type_1"].values[0],
+#                 "Attack": pokemon_data["stats"][4]["base_stat"],
+#                 "Defense": pokemon_data["stats"][3]["base_stat"],
+#                 "Total Points": sum(stat["base_stat"] for stat in pokemon_data["stats"]),
+#                 "Catch Rate": df.loc[df["name"] == selected_pokemon, "catch_rate"].values[0],
+#             }
+#             # Convert the stats dictionary to a DataFrame with two columns
+#             stats_df = pd.DataFrame.from_dict(stats, orient='index', columns=["Value"])
+#             # Adjust the table size to make it slimmer and remove the header row
+#             st.table(stats_df.style.set_table_styles([
+#                 dict(selector="thead", props=[("display", "none")]),
+#                 dict(selector="th", props=[("max-width", "15px")]),
+#                 dict(selector="td", props=[("padding", "2px")])  # Increase row spacing
 
-            ]))
-            st.markdown(catch_rate_phrase(pokemon_name))
+#             ]))
+#             st.markdown(catch_rate_phrase(pokemon_name))
 
-        else:
-            st.warning("Pokemon not found in the API.")
-            st.text("Just Enjoy some stats of this pokemon.")
-            stats = {
-                "Name": pokemon_name,
-                "Generation": df.loc[df["name"] == selected_pokemon, "generation"].values[0],
-                "Type": df.loc[df["name"] == selected_pokemon, "type_1"].values[0],
-                "Attack": pokemon_data["stats"][4]["base_stat"],
-                "Defense": pokemon_data["stats"][3]["base_stat"],
-                "Total Points": sum(stat["base_stat"] for stat in pokemon_data["stats"]),
-                "Catch Rate": df.loc[df["name"] == selected_pokemon, "catch_rate"].values[0],
-            }
-            # Convert the stats dictionary to a DataFrame with two columns
-            stats_df = pd.DataFrame.from_dict(stats, orient='index', columns=["Value"])
-            # Adjust the table size to make it slimmer and remove the header row
-            st.table(stats_df.style.set_table_styles([
-                dict(selector="thead", props=[("display", "none")]),
-                dict(selector="th", props=[("max-width", "15px")]),
-                dict(selector="td", props=[("padding", "2px")])  # Increase row spacing
+#         else:
+#             st.warning("Pokemon not found in the API.")
+#             st.text("Just Enjoy some stats of this pokemon.")
+#             stats = {
+#                 "Name": pokemon_name,
+#                 "Generation": df.loc[df["name"] == selected_pokemon, "generation"].values[0],
+#                 "Type": df.loc[df["name"] == selected_pokemon, "type_1"].values[0],
+#                 "Attack": pokemon_data["stats"][4]["base_stat"],
+#                 "Defense": pokemon_data["stats"][3]["base_stat"],
+#                 "Total Points": sum(stat["base_stat"] for stat in pokemon_data["stats"]),
+#                 "Catch Rate": df.loc[df["name"] == selected_pokemon, "catch_rate"].values[0],
+#             }
+#             # Convert the stats dictionary to a DataFrame with two columns
+#             stats_df = pd.DataFrame.from_dict(stats, orient='index', columns=["Value"])
+#             # Adjust the table size to make it slimmer and remove the header row
+#             st.table(stats_df.style.set_table_styles([
+#                 dict(selector="thead", props=[("display", "none")]),
+#                 dict(selector="th", props=[("max-width", "15px")]),
+#                 dict(selector="td", props=[("padding", "2px")])  # Increase row spacing
 
-            ]))
-            st.markdown(catch_rate_phrase(pokemon_name))
+#             ]))
+#             st.markdown(catch_rate_phrase(pokemon_name))
 
-    with bg_1_2:
-        # Load the button image
-        button_image_path = "Poke_Ball.webp"
-        button_image = Image.open(button_image_path)
-        # Reduce the image size to improve loading time
-        button_image.thumbnail((180, 200))  # Adjust the size as needed
+#     with bg_1_2:
+#         # Load the button image
+#         button_image_path = "Poke_Ball.webp"
+#         button_image = Image.open(button_image_path)
+#         # Reduce the image size to improve loading time
+#         button_image.thumbnail((180, 200))  # Adjust the size as needed
 
-        st.header("")
-        st.header("")
-        st.header("")
-        st.header("")
-        st.header("")
-        st.header("")
-        st.header("")
-        st.header("")
-        st.header("")
-        st.header("")
-        st.header("")
+#         st.header("")
+#         st.header("")
+#         st.header("")
+#         st.header("")
+#         st.header("")
+#         st.header("")
+#         st.header("")
+#         st.header("")
+#         st.header("")
+#         st.header("")
+#         st.header("")
 
-        # Button to open the link
-        if st.image(button_image, use_column_width=True, caption="Click to start the battle"):
-            link = "https://pvpoke.com/train/"
-            if st.button('Start Battle'):
-                # Example battle simulation
-                battle_log, winner = simulate_turn_based_battle(contender1, contender2)
+#         # Button to open the link
+#         if st.image(button_image, use_column_width=True, caption="Click to start the battle"):
+#             link = "https://pvpoke.com/train/"
+#             if st.button('Start Battle'):
+#                 # Example battle simulation
+#                 battle_log, winner = simulate_turn_based_battle(contender1, contender2)
 
-                for log in battle_log:
-                    st.markdown(log)
-                    # st.markdown("![Alt Text](https://media.giphy.com/media/dzIrXQiyqgsSbGGpZR/giphy.gif)")
-                    time.sleep(1.0)
-                if winner:
-                    st.markdown(f"\n{winner} wins the battle!")
-                else:
-                    st.markdown("\nIt's a tie!")
+#                 for log in battle_log:
+#                     st.markdown(log)
+#                     # st.markdown("![Alt Text](https://media.giphy.com/media/dzIrXQiyqgsSbGGpZR/giphy.gif)")
+#                     time.sleep(1.0)
+#                 if winner:
+#                     st.markdown(f"\n{winner} wins the battle!")
+#                 else:
+#                     st.markdown("\nIt's a tie!")
 
 with tab3:
     # Introduction
