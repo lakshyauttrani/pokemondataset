@@ -312,7 +312,7 @@ with tab1:
             # Adjust the table size to make it slimmer and remove the header row
             st.table(stats_df.style.set_table_styles([
                 dict(selector="thead", props=[("display", "none")]),
-                dict(selector="th", props=[("max-width", "15px")]),
+                dict(selector="th", props=[("max-width", "30px")]),
                 dict(selector="td", props=[("padding", "2px")])  # Increase row spacing
 
             ]))
@@ -385,7 +385,7 @@ with tab1:
             # Adjust the table size to make it slimmer and remove the header row
             st.table(stats_df.style.set_table_styles([
                 dict(selector="thead", props=[("display", "none")]),
-                dict(selector="th", props=[("max-width", "15px")]),
+                dict(selector="th", props=[("max-width", "30px")]),
                 dict(selector="td", props=[("padding", "2px")])  # Increase row spacing
 
             ]))
@@ -408,7 +408,7 @@ with tab1:
             # Adjust the table size to make it slimmer and remove the header row
             st.table(stats_df.style.set_table_styles([
                 dict(selector="thead", props=[("display", "none")]),
-                dict(selector="th", props=[("max-width", "15px")]),
+                dict(selector="th", props=[("max-width", "30px")]),
                 dict(selector="td", props=[("padding", "2px")])  # Increase row spacing
 
             ]))
