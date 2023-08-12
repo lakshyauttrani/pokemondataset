@@ -1,5 +1,5 @@
 import urllib.request
-
+import base64
 # import gender_guesser.detector as gender
 #import openpyxl
 import numpy as np
@@ -168,27 +168,39 @@ row0_spacer1, row0_1, row0_spacer2, row0_2, row0_spacer3 = st.columns(
 )
 
 with row0_1:
-    st.header("Welcome to Pokéviz")
+    st.header("Welcome to Pokéviz BattleGround")
 
     st.markdown(
-        "Step into the extraordinary realm of captivating creatures, where imagination knows no bounds! Prepare to embark on an exhilarating journey through the enchanting world of Pokemon in this data-driven adventure."
-
-    )
-    st.markdown(
-        "⚡ Welcome to the showdown! ⚡"
+        "⚡ It's time for showdown! ⚡"
     )
 
-# Button Image
-button_image_path = "Battle_groud.webp"
-button_image = Image.open(button_image_path)
-# Reduce the image size to improve loading time
-button_image.thumbnail((200, 200))  # Adjust the size as needed
+def get_base64(bin_file):
+    with open(bin_file, 'rb') as f:
+        data = f.read()
+    return base64.b64encode(data).decode()
 
-# Button to open the new Streamlit page
-with row0_2:
-    if st.image(button_image, use_column_width=True, caption="Click to enter the battle ground"):
-        link = "pokeviz2.py"
-        # Use Markdown to create a hyperlink to the new Streamlit app
+def set_background(png_file):
+    bin_str = get_base64(png_file)
+    page_bg_img = '''
+    <style>
+    .stApp {
+    background-image: url("data:image/png;base64,%s");
+    background-size: cover;
+    }
+    </style>
+    ''' % bin_str
+    st.markdown(page_bg_img, unsafe_allow_html=True)
+
+# set_background('background6.jpg')
+
+
+def convert_to_black_and_white(image_url):
+    response = requests.get(image_url)
+    if response.status_code == 200:
+        image_data = response.content
+        image = Image.open(BytesIO(image_data))
+        bw_image = image.convert("L")  # Convert to grayscale
+        return bw_image
 
 
 
@@ -204,6 +216,10 @@ with tab1:
 
     contender1 = ''
     contender2 = ''
+    selected_pokemon_data = {
+    "Contender 1": {"name": None, "image_url": None},
+    "Contender 2": {"name": None, "image_url": None}
+    }
 
     with bg_1_1:
         # Create two columns for filters
@@ -237,6 +253,8 @@ with tab1:
             # Use PokeSprites API for higher resolution images
             pokemon_image_url = f"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/{pokemon_data['id']}.png"
             pokemon_name = pokemon_data["name"]
+            selected_pokemon_data["Contender 1"]["name"] = selected_pokemon.lower()
+            selected_pokemon_data["Contender 1"]["image_url"] = pokemon_image_url
 
             # Display the Pokemon image and stats
             # image_column, stats_column, image_column = st.columns((1, 2))
@@ -332,6 +350,8 @@ with tab1:
             pokemon_image_url = f"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/{pokemon_data['id']}.png"
             pokemon_name = pokemon_data["name"]
 
+            selected_pokemon_data["Contender 2"]["name"] = selected_pokemon.lower()
+            selected_pokemon_data["Contender 2"]["image_url"] = pokemon_image_url
             # Display the Pokemon image and stats
             # image_column, stats_column, image_column = st.columns((1, 2))
 
@@ -414,7 +434,7 @@ with tab1:
         st.header("")
 
         # Button to open the link
-        if st.image(button_image, use_column_width=True, caption="Click to start the battle"):
+        if st.image(button_image, use_column_width=True):
             link = "https://pvpoke.com/train/"
             if st.button('Start Battle'):
                 # Example battle simulation
@@ -425,6 +445,25 @@ with tab1:
                     # st.markdown("![Alt Text](https://media.giphy.com/media/dzIrXQiyqgsSbGGpZR/giphy.gif)")
                     time.sleep(1.0)
                 if winner:
-                    st.markdown(f"\n{winner} wins the battle!")
+                    # Determine the loser based on the winner
+                    loser_pokemon = contender1 if winner == contender2 else contender2
+                    loser_pokemon_name = loser_pokemon.lower()
+                    pokeapi_url = f"https://pokeapi.co/api/v2/pokemon/{loser_pokemon_name}"
+                    response = requests.get(pokeapi_url)
+
+                    if response.status_code == 200:
+                        loser_pokemon_data = response.json()
+                        loser_pokemon_image_url = f"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/{loser_pokemon_data['id']}.png"
+
+                        # Store the loser Pokemon data
+                        selected_pokemon_data[loser_pokemon_name] = {
+                            "data": loser_pokemon_data,
+                            "image_url": loser_pokemon_image_url
+                        }
+
+                        # Display the loser's black and white image
+                        loser_bw_image = convert_to_black_and_white(loser_pokemon_image_url)
+                        st.markdown(f"**Loser: {loser_pokemon}**")
+                        st.image(loser_bw_image, use_column_width=True)
                 else:
                     st.markdown("\nIt's a tie!")
