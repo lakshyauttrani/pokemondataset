@@ -21,7 +21,7 @@ import random
 # Add a dark mode slider button
 
 
-df = pd.read_csv("bin/data/pokedex_input.csv")
+df = pd.read_csv("Poekviz/bin/data/pokedex_input.csv")
 
 df.drop(columns=['Unnamed: 0','german_name','japanese_name'],inplace=True)
 df['catch_label'] = pd.qcut(df['catch_rate'], 4, labels=['You Got Lucky', 'Super Hard', 'Caught It', 'Meh'], retbins=False, precision=3, duplicates='raise')
@@ -415,7 +415,7 @@ with tab1:
 
     with bg_1_2:
         # Load the button image
-        button_image_path = "bin/images/Poke_Ball.webp"
+        button_image_path = "Pokeviz/bin/images/Poke_Ball.webp"
         button_image = Image.open(button_image_path)
         # Reduce the image size to improve loading time
         button_image.thumbnail((180, 200))  # Adjust the size as needed
