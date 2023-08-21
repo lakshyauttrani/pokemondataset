@@ -117,7 +117,7 @@ with row0_1:
 
 with row0_2:
     # Load and resize the image
-    image_path = "bin/images/Battle_groud_bkp.webp"
+    image_path = "Pokeviz/bin/images/Battle_groud_bkp.webp"
     st.markdown(
         "<div style='text-align: center;'><a href='https://pokemonbattle.streamlit.app/'><img src='https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/1733aa4c-c30e-4ecc-b8d6-80ef83ca0b8e/d3bqzxd-a81ee1f1-6c5f-4081-8640-b4cba8caf363.png/v1/fill/w_797,h_458/pokemon_battle_frontier_logo_by_pklucario_d3bqzxd-fullview.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9NDU4IiwicGF0aCI6IlwvZlwvMTczM2FhNGMtYzMwZS00ZWNjLWI4ZDYtODBlZjgzY2EwYjhlXC9kM2JxenhkLWE4MWVlMWYxLTZjNWYtNDA4MS04NjQwLWI0Y2JhOGNhZjM2My5wbmciLCJ3aWR0aCI6Ijw9Nzk3In1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmltYWdlLm9wZXJhdGlvbnMiXX0.v3pX-GaQcPxrvpqOLDz5T1SmmVHVdCUqaqDspmOIf8w' alt='Battle' style='width: 100%; max-width: 700px;'></a></div>",
         unsafe_allow_html=True
