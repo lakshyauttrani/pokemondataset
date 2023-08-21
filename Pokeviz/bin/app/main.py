@@ -17,8 +17,8 @@ import random
 import os
 import matplotlib.pyplot as plt
 
-input_file = "bin/data/pokedex_input.csv"
-revenue_file = "bin//data/revenue.csv"
+input_file = "Pokeviz/bin/data/pokedex_input.csv"
+revenue_file = "Pokeviz/bin/data/revenue.csv"
 
 #Read and transform data
 df = pd.read_csv(input_file)
