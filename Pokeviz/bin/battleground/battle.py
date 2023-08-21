@@ -21,7 +21,7 @@ import random
 # Add a dark mode slider button
 
 
-df = pd.read_csv("Poekviz/bin/data/pokedex_input.csv")
+df = pd.read_csv("Pokeviz/bin/data/pokedex_input.csv")
 
 df.drop(columns=['Unnamed: 0','german_name','japanese_name'],inplace=True)
 df['catch_label'] = pd.qcut(df['catch_rate'], 4, labels=['You Got Lucky', 'Super Hard', 'Caught It', 'Meh'], retbins=False, precision=3, duplicates='raise')
