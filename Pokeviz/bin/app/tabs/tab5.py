@@ -25,7 +25,7 @@ def display_tab(df, df2, color_theme):
 
     with r1:
 
-        ksmaurya_image_path = "/Users/ksmaurya/Documents/AnalyticonViz/Pokeviz/bin/images/ksmaurya.png"
+        ksmaurya_image_path = "Pokeviz/bin/images/ksmaurya.png"
         ksmaurya_image = Image.open(ksmaurya_image_path)
         # Reduce the image size to improve loading time
         ksmaurya_image.thumbnail((1000, 1000))  # Adjust the size as needed
@@ -49,7 +49,7 @@ def display_tab(df, df2, color_theme):
 
     with r2:
 
-        caclopes_image_path = "/Users/ksmaurya/Documents/AnalyticonViz/Pokeviz/bin/images/caclopes.png"
+        caclopes_image_path = "Pokeviz/bin/images/caclopes.png"
         caclopes_image = Image.open(caclopes_image_path)
         # Reduce the image size to improve loading time
         caclopes_image.thumbnail((1000, 1000))  # Adjust the size as needed
@@ -72,7 +72,7 @@ def display_tab(df, df2, color_theme):
 
     with r3:
 
-        lakshutt_image_path = "/Users/ksmaurya/Documents/AnalyticonViz/Pokeviz/bin/images/lakshutt.png"
+        lakshutt_image_path = "Pokeviz/bin/images/lakshutt.png"
         lakshutt_image = Image.open(lakshutt_image_path)
         # Reduce the image size to improve loading time
         lakshutt_image.thumbnail((1000, 1000))  # Adjust the size as needed

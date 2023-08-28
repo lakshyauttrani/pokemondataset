@@ -144,7 +144,7 @@ def display_tab(df, df2, color_theme):
 
     else:
         pokemon_name = selected_pokemon  # Set a default name
-        local_image_path = "/Users/ksmaurya/Documents/AnalyticonViz/Pokeviz/bin/images/pokemon_image_nf.jpg"
+        local_image_path = "Pokeviz/bin/images/pokemon_image_nf.jpg"
         with image_column:
             st.markdown(f"<h1 style='text-align: center;'>{pokemon_name.upper()}</h1>", unsafe_allow_html=True)
             local_image = Image.open(local_image_path)

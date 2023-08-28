@@ -26,8 +26,8 @@ def image_to_base64(image):
     return base64.b64encode(buffered.getvalue()).decode()
 
 
-input_file = "/Users/ksmaurya/Documents/AnalyticonViz/Pokeviz/bin/data/pokedex_input.csv"
-revenue_file = "/Users/ksmaurya/Documents/AnalyticonViz/Pokeviz/bin/data/revenue.csv"
+input_file = "Pokeviz/bin/data/pokedex_input.csv"
+revenue_file = "Pokeviz/bin/data/revenue.csv"
 
 #Read and transform data
 df = pd.read_csv(input_file)
@@ -79,7 +79,7 @@ with row0_1:
 with row0_2:
 
 
-    image_path = "/Users/ksmaurya/Documents/AnalyticonViz/Pokeviz/bin/images/pokemon_logo.png"
+    image_path = "Pokeviz/bin/images/pokemon_logo.png"
     image = Image.open(image_path)
     image_url = "https://pokemonbattle.streamlit.app/"
 
