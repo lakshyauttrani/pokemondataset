@@ -1,44 +1,56 @@
-import urllib.request
 import base64
-# import gender_guesser.detector as gender
-#import openpyxl
-import numpy as np
+from io import BytesIO
+import sys
 import pandas as pd
+import os
+from PIL import Image
+import plotly as plt
 import plotly.express as px
+import random
 import requests
 import streamlit as st
-import xmltodict
-from pandas import json_normalize
-# from streamlit_extras.add_vertical_space import add_vertical_space
-# from streamlit_lottie import st_lottie
-import requests
-from PIL import Image
-from io import BytesIO
 import time
-import random
 
-
-# Add a dark mode slider button
-
+# Reading the data
 
 df = pd.read_csv("Pokeviz/bin/data/pokedex_input.csv")
+df.drop(columns=['Unnamed: 0', 'german_name', 'japanese_name'], inplace=True)
+df['catch_label'] = pd.qcut(df['catch_rate'], 4, labels=['You Got Lucky', 'Super Hard', 'Caught It', 'Meh'],
+                            retbins=False, precision=3, duplicates='raise')
 
-df.drop(columns=['Unnamed: 0','german_name','japanese_name'],inplace=True)
-df['catch_label'] = pd.qcut(df['catch_rate'], 4, labels=['You Got Lucky', 'Super Hard', 'Caught It', 'Meh'], retbins=False, precision=3, duplicates='raise')
 
-def return_letter_by_letter(text, delay=0.07):
-    for letter in text:
-        yield letter
-        time.sleep(delay)
+def typing_effect(message, font_size=17):
+    st.markdown(
+        f"<p id='typing' style='text-align: center; font-size: {font_size}px;'></p>",
+        unsafe_allow_html=True
+    )
 
-def return_letter_by_letter(text, delay=0.05):
-    words = text.split()
-    for word in words:
-        for letter in word:
-            yield letter
-            time.sleep(delay)
-        yield ' '  # Add a space between words
-        time.sleep(delay)  # Add extra delay between words
+    typing_script = """
+    <script>
+        var text = `""" + message.replace("`", "\\`") + """`;
+        var typingSpeed = 50;
+        var element = document.getElementById('typing');
+        function typeCharacter(i) {
+            if (i < text.length) {
+                element.innerHTML += text.charAt(i);
+                i++;
+                setTimeout(function() { typeCharacter(i); }, typingSpeed);
+            }
+        }
+        typeCharacter(0);
+    </script>
+    """
+    st.markdown(typing_script, unsafe_allow_html=True)
+
+def image_to_base64(image):
+    buffered = BytesIO()
+    image.save(buffered, format="PNG")
+    return base64.b64encode(buffered.getvalue()).decode()
+
+def get_generation_name(generation):
+    return f"{generation}{'st' if generation == 1 else 'nd' if generation == 2 else 'rd' if generation == 3 else 'th'} Gen"
+
+
 
 
 # Selection of pokemons and comments
@@ -55,7 +67,7 @@ def catch_rate_phrase(name):
         if pd.notna(status) and pd.notna(catch_label):
             matching_rows = filtered_df[
                 (filtered_df['status'] == status) & (filtered_df['catch_label'] == catch_label)
-            ]
+                ]
             if not matching_rows.empty:
                 if catch_label == 'You Got Lucky':
                     return "Are you sure you really caught it? It's super tough to catch one!"
@@ -74,11 +86,12 @@ def catch_rate_phrase(name):
     else:
         return 'No matching name found in the DataFrame.'
 
-def calculate_effectiveness(attacker_type_1, attacker_type_2, defender_name,attacker_base_hit):
+
+def calculate_effectiveness(attacker_type_1, attacker_type_2, defender_name, attacker_base_hit):
     defender_rows = df[df['name'] == defender_name]
     against_column = 'against_' + attacker_type_1.lower()
     val_def = defender_rows[against_column].values[0]
-    impact  = attacker_base_hit*val_def
+    impact = attacker_base_hit * val_def
 
     if (attacker_type_2):
         against_column = 'against_' + attacker_type_2.lower()
@@ -86,18 +99,21 @@ def calculate_effectiveness(attacker_type_1, attacker_type_2, defender_name,atta
             return impact
         else:
             val_def = defender_rows[against_column].values[0]
-            impact = impact+ (attacker_base_hit*val_def)
+            impact = impact + (attacker_base_hit * val_def)
 
     return impact
+
 
 def swapList(sl):
     sl[0], sl[1] = sl[1], sl[0]
     return sl
 
+
 def get_non_null_abilities(row):
     abilities_df = ['ability_1', 'ability_2', 'ability_hidden']
     non_null_abilities = [ability for ability in abilities_df if pd.notna(row[ability])]
     return non_null_abilities
+
 
 def simulate_turn_based_battle(attacker_name, defender_name):
     attacker_rows = df[df['name'] == attacker_name]
@@ -127,13 +143,15 @@ def simulate_turn_based_battle(attacker_name, defender_name):
             random_ability = None
 
         if attacker_row['type_number'] == 1:
-            damage_taken_defender = calculate_effectiveness(attacker_row['type_1'], None, defender_name, attacker_row['attack'])
+            damage_taken_defender = calculate_effectiveness(attacker_row['type_1'], None, defender_name,
+                                                            attacker_row['attack'])
             if defender_row['total_points'] - damage_taken_defender < 0:
                 defender_row['total_points'] = 0
             else:
                 defender_row['total_points'] = defender_row['total_points'] - damage_taken_defender
         else:
-            damage_taken_defender = calculate_effectiveness(attacker_row['type_1'], attacker_row['type_2'], defender_name, attacker_row['attack'])
+            damage_taken_defender = calculate_effectiveness(attacker_row['type_1'], attacker_row['type_2'],
+                                                            defender_name, attacker_row['attack'])
             defender_row['total_points'] = defender_row['total_points'] - damage_taken_defender
             if defender_row['total_points'] - damage_taken_defender < 0:
                 defender_row['total_points'] = 0
@@ -159,165 +177,216 @@ def simulate_turn_based_battle(attacker_name, defender_name):
     return battle_log, winner
 
 
+
+def get_pokemon_details(selected_pokemon, theme, winner):
+    # Fetch the Pokemon data from the API
+    pokeapi_url = f"https://pokeapi.co/api/v2/pokemon/{selected_pokemon.lower()}"
+    response = requests.get(pokeapi_url)
+    pokemon_data = None
+
+    if response.status_code == 200:
+        pokemon_data = response.json()  # Assign the data
+        pokemon_name = pokemon_data["name"].capitalize()
+
+    if pokemon_data:
+        # Use PokeSprites API for higher resolution images
+        pokemon_image_url = f"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/{pokemon_data['id']}.png"
+        response_image = requests.get(pokemon_image_url)
+
+        st.markdown(f"<h1 style='text-align: center;'>{pokemon_name.upper()} </h1>", unsafe_allow_html=True)
+        image = Image.open(BytesIO(response_image.content))
+
+        if winner == "yes":
+            image = Image.open(BytesIO(response_image.content))
+        elif winner == "no":
+            image = image.convert("L")
+
+
+
+        max_image_width = 600
+        max_image_height = 600
+        image.thumbnail((max_image_width, max_image_height))
+        # st.image(image, use_column_width=True)
+        st.markdown(
+            f"<div style='max-width: {max_image_width}px; max-height: {max_image_height}px; margin: 0 auto; text-align: center;'>"
+            f"<img src='data:image/png;base64,{image_to_base64(image)}' alt='{pokemon_name}' style='width: 100%; max-width: {max_image_width}px; max-height: {max_image_height}px;'>"
+            "</div>",
+            unsafe_allow_html=True
+        )
+        st.markdown("")
+        st.markdown(f"<p style='text-align: center; font-size: 0.75vw;'>{catch_rate_phrase(pokemon_name)}</p>",
+                    unsafe_allow_html=True)
+
+
+    else:
+        pokemon_name = selected_pokemon  # Set a default name
+        local_image_path = "Pokeviz/bin/images/pokemon_image_nf.jpg"
+
+        st.markdown(f"<h1 style='text-align: center;'>{pokemon_name.upper()}</h1>", unsafe_allow_html=True)
+        local_image = Image.open(local_image_path)
+        # Restrict image size to a certain resolution
+        max_image_width = 500
+        max_image_height = 500
+        local_image.thumbnail((max_image_width, max_image_height))
+        st.markdown(
+            f"<div style='display: flex; justify-content: center;'>"
+            f"<img src='data:image/png;base64,{image_to_base64(local_image)}' alt='{pokemon_name}' style='width: 660px;'>"
+            "</div>",
+            unsafe_allow_html=True
+        )
+        st.markdown(
+            f"<p style='text-align: center; font-size: 0.5vw;'>Sorry we cannot find the image of {(pokemon_name)} 😔 </p>",
+            unsafe_allow_html=True)
+        st.markdown(
+            f"<p style='text-align: center; font-size: 0.5vw;'>But you can still have a Battle!</p>",
+            unsafe_allow_html=True)
+
+    stats = {
+        "Name": selected_pokemon,
+        "Generation": get_generation_name(df.loc[df["name"] == selected_pokemon, "generation"].values[0]),
+        "Type": df.loc[df["name"] == selected_pokemon, "type_1"].values[0],
+        "Attack": "{:.2f} pts".format(df.loc[df["name"] == selected_pokemon, "attack"].values[0]),
+        "Special Attack": "{:.2f} pts".format(df.loc[df["name"] == selected_pokemon, "sp_attack"].values[0]),
+        "Defense": "{:.2f} pts".format(df.loc[df["name"] == selected_pokemon, "defense"].values[0]),
+        "Special Defense": "{:.2f} pts".format(df.loc[df["name"] == selected_pokemon, "sp_defense"].values[0]),
+        "Total Points": "{:.2f} pts".format(df.loc[df["name"] == selected_pokemon, "total_points"].values[0]),
+        "Speed": "{:.2f} pts".format(df.loc[df["name"] == selected_pokemon, "speed"].values[0]),
+        "HP": "{:.2f} pts".format(df.loc[df["name"] == selected_pokemon, "hp"].values[0])
+    }
+
+    # Convert the stats dictionary to a DataFrame with two columns
+    stats_df = pd.DataFrame.from_dict(stats, orient='index', columns=["Value"])
+
+    # Apply custom CSS for styling
+    st.markdown(
+        """
+        <style>
+        .styled-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0 auto;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        .styled-table th, .styled-table td {
+            padding: 12px 15px;
+            border: 1px solid #e0e0e0;
+            text-align: left;
+        }
+        .styled-table th {
+            background-color: #f5f5f5;
+            color: #333;
+            font-weight: bold;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+    # Display the table using Streamlit's st.table
+    st.table(stats_df.style.set_table_styles([
+        {"selector": "th",
+         "props": [("background-color", f"{theme}"), ("color", "#333"), ("font-weight", "bold"), ("font-size", "17px")]},
+        {"selector": "td",
+         "props": [("border", f"1px solid {theme}"), ("padding", "10px 32px"), ("text-align", "left")]},
+        {"selector": "thead",
+         "props": [("display", "none")]}
+    ]))
+
+
+
+
+
 st.set_page_config(page_title="PokeViz App", layout="wide")
 
-#Header
-row0_spacer1, row0_1, row0_spacer2, row0_2, row0_spacer3 = st.columns(
-    (0.1, 2, 0.2, 1, 0.1)
+
+st.markdown("<div style='text-align: center; font-size: 2.8vw; font-weight: bold;'>Welcome to the Showdown 😈</div>",
+            unsafe_allow_html=True)
+
+st.markdown("<div style='text-align: center; font-size: 2vw;'>Unleash the Poke-challenger within!</div>",
+            unsafe_allow_html=True)
+
+st.markdown("<div style='text-align: center; font-size: 0.7vw;'>It's time to clash, compete, and catch 'em in the ultimate battle showdown! Let the Pokémon brawl begin!</div>",
+            unsafe_allow_html=True)
+
+
+
+# Button Image
+button_image_path = "Pokeviz/bin/images/Poke_Ball.webp"
+button_image = Image.open(button_image_path)
+# Reduce the image size to improve loading time
+button_image.thumbnail((200, 200))  # Adjust the size as needed
+
+
+
+contender1 = ''
+contender2 = ''
+theme1 = '#FFA78C'
+theme2 = '#E7F4D3'
+
+
+bg_space1, bg_1_1, bg_space2, bg_1_2, bg_space3, bg_1_3, bg_space4 = st.columns(
+    (0.05, 0.4, 0.01, 0.2, 0.01, 0.4, 0.05)
 )
 
-with row0_1:
-    st.header("Welcome to Pokéviz BattleGround")
-
-    st.markdown(
-        "⚡ It's time for showdown! ⚡"
-    )
-
-def get_base64(bin_file):
-    with open(bin_file, 'rb') as f:
-        data = f.read()
-    return base64.b64encode(data).decode()
-
-def set_background(png_file):
-    bin_str = get_base64(png_file)
-    page_bg_img = '''
-    <style>
-    .stApp {
-    background-image: url("data:image/png;base64,%s");
-    background-size: cover;
-    }
-    </style>
-    ''' % bin_str
-    st.markdown(page_bg_img, unsafe_allow_html=True)
-
-# set_background('background6.jpg')
-
-
-def convert_to_black_and_white(image_url):
-    response = requests.get(image_url)
-    if response.status_code == 200:
-        image_data = response.content
-        image = Image.open(BytesIO(image_data))
-        bw_image = image.convert("L")  # Convert to grayscale
-        return bw_image
-
-
-
-
-line1_spacer1, line1_1, line1_spacer2 = st.columns((0.1, 3.2, 0.1))
-
-
-tab1, tab2 = st.tabs(["Battle Ground", ""])
-with tab1:
-    bg_space1, bg_1_1, bg_space2, bg_1_2, bg_space3, bg_1_3 = st.columns(
-        (0.1, 1, 0.1, 0.4, 0.1, 1)
-    )
-
-    contender1 = ''
-    contender2 = ''
-    selected_pokemon_data = {
-    "Contender 1": {"name": None, "image_url": None},
-    "Contender 2": {"name": None, "image_url": None}
-    }
-
+def left_side(winner):
     with bg_1_1:
+        st.markdown(f"<p style='text-align: center; font-size: 20px;'> - Select the 1st Contender - </p>",
+                    unsafe_allow_html=True)
+
         # Create two columns for filters
         bgr_column1, bgr_column2, bgr_column3, bgr_column4 = st.columns(4)
 
         # Filter by Generation
+        default_generation = 1
         selected_generation = bgr_column1.selectbox("Generation", df["generation"].unique(),
                                                     key="generation")
 
         # Filter by Type based on selected Generation
         filtered_df_by_generation = df[df["generation"] == selected_generation]
+        default_status = 'Normal'
         selected_status = bgr_column2.selectbox("Select Status", filtered_df_by_generation["status"].unique(),
+                                                index=filtered_df_by_generation["status"].unique().tolist().index(
+                                                    default_status),
                                                 key="status")
 
         # Filter by Type based on selected Generation
         filtered_df_by_generation = df[df["status"] == selected_status]
-        selected_type = bgr_column3.selectbox("Select a Type", filtered_df_by_generation["type_1"].unique(),
-                                              key="type")
+        default_type = 'Electric'
+        unique_types = filtered_df_by_generation["type_1"].unique().tolist()
+
+        if default_type in unique_types:
+            default_type_index = unique_types.index(default_type)
+        else:
+            default_type_index = 0
+
+        selected_type = bgr_column3.selectbox("Select a Type", unique_types, index=default_type_index, key="type")
 
         # Filter by Name based on selected Generation and Type
         filtered_df_by_type = filtered_df_by_generation[filtered_df_by_generation["type_1"] == selected_type]
+
         selected_pokemon = bgr_column4.selectbox("Select a Pokemon", filtered_df_by_type["name"], key="pokemon")
+
+        if selected_type  in ["Fire", "Poison", "Electric", "Fighting", "Dragon"]:
+            theme_1 = "#FFA78C"
+        elif selected_type in ["Water", "Dragon", "Steel"]:
+            theme_1 = "#D4F1F9"
+        elif selected_type in ["Grass", "Ice", "Fairy", "Ghost"]:
+            theme_1 = "#E7F4D3"
+        elif selected_type in ["Bug", "Normal", "Dark", "Ground", "Psychic", "Rock"]:
+            theme_1 = "#F1D5AA"
+
         contender1 = selected_pokemon
 
-        # Fetch the Pokemon data from the API
-        pokeapi_url = f"https://pokeapi.co/api/v2/pokemon/{selected_pokemon.lower()}"
-        response = requests.get(pokeapi_url)
+        get_pokemon_details(contender1, theme1, winner)
+        return contender1
 
-        if response.status_code == 200:
-            pokemon_data = response.json()
-            # Use PokeSprites API for higher resolution images
-            pokemon_image_url = f"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/{pokemon_data['id']}.png"
-            pokemon_name = pokemon_data["name"]
-            selected_pokemon_data["Contender 1"]["name"] = selected_pokemon.lower()
-            selected_pokemon_data["Contender 1"]["image_url"] = pokemon_image_url
+contender1 = left_side("nowinner")
 
-            # Display the Pokemon image and stats
-            # image_column, stats_column, image_column = st.columns((1, 2))
-
-            # Check if the higher resolution image is available
-            response_image_high_res = requests.get(pokemon_image_url)
-            if response_image_high_res.status_code == 200:
-                # with image_column:
-                st.markdown(f"<h1 style='text-align: center;'>{pokemon_name.upper()}</h1>", unsafe_allow_html=True)
-                image = Image.open(BytesIO(response_image_high_res.content))
-                st.image(image, use_column_width=True)
-            else:
-                # If higher resolution image is not available, use the other API with lower resolution
-                pokemon_image_url_low_res = pokemon_data["sprites"]["front_default"]
-                # with image_column:
-                st.markdown(f"<h1 style='text-align: center;'>{pokemon_name.upper()}</h1>", unsafe_allow_html=True)
-                response_image_low_res = requests.get(pokemon_image_url_low_res)
-                image_low_res = Image.open(BytesIO(response_image_low_res.content))
-                st.image(image_low_res, use_column_width=True, caption="Sorry for the image quality")
-
-            stats = {
-                "Name": pokemon_name,
-                "Generation": df.loc[df["name"] == selected_pokemon, "generation"].values[0],
-                "Type": df.loc[df["name"] == selected_pokemon, "type_1"].values[0],
-                "Attack": pokemon_data["stats"][4]["base_stat"],
-                "Defense": pokemon_data["stats"][3]["base_stat"],
-                "Total Points": sum(stat["base_stat"] for stat in pokemon_data["stats"]),
-                "Catch Rate": df.loc[df["name"] == selected_pokemon, "catch_rate"].values[0],
-            }
-            # Convert the stats dictionary to a DataFrame with two columns
-            stats_df = pd.DataFrame.from_dict(stats, orient='index', columns=["Value"])
-            # Adjust the table size to make it slimmer and remove the header row
-            st.table(stats_df.style.set_table_styles([
-                dict(selector="thead", props=[("display", "none")]),
-                dict(selector="th", props=[("max-width", "30px")]),
-                dict(selector="td", props=[("padding", "2px")])  # Increase row spacing
-
-            ]))
-            st.markdown(catch_rate_phrase(pokemon_name))
-
-        else:
-            st.warning("Pokemon not found in the API.")
-            st.text("Just Enjoy some stats of this pokemon.")
-            stats = {
-                "Name": pokemon_name,
-                "Generation": df.loc[df["name"] == selected_pokemon, "generation"].values[0],
-                "Type": df.loc[df["name"] == selected_pokemon, "type_1"].values[0],
-                "Attack": pokemon_data["stats"][4]["base_stat"],
-                "Defense": pokemon_data["stats"][3]["base_stat"],
-                "Total Points": sum(stat["base_stat"] for stat in pokemon_data["stats"]),
-                "Catch Rate": df.loc[df["name"] == selected_pokemon, "catch_rate"].values[0],
-            }
-            # Convert the stats dictionary to a DataFrame with two columns
-            stats_df = pd.DataFrame.from_dict(stats, orient='index', columns=["Value"])
-            # Adjust the table size to make it slimmer and remove the header row
-            st.table(stats_df.style.set_table_styles([
-                dict(selector="thead", props=[("display", "none")]),
-                dict(selector="th", props=[("max-width", "30px")]),
-                dict(selector="td", props=[("padding", "2px")])  # Increase row spacing
-
-            ]))
-            st.markdown(catch_rate_phrase(pokemon_name))
-
+def right_side(winner):
     with bg_1_3:
+        st.markdown(f"<p style='text-align: center; font-size: 20px;'> - Select the 2nd Contender - </p>",
+                    unsafe_allow_html=True)
+
         # Create two columns for filters
         bgr_column1, bgr_column2, bgr_column3, bgr_column4 = st.columns(4)
 
@@ -338,131 +407,112 @@ with tab1:
         # Filter by Name based on selected Generation and Type
         filtered_df_by_type = filtered_df_by_generation[filtered_df_by_generation["type_1"] == selected_type]
         selected_pokemon = bgr_column4.selectbox("Select a Pokemon", filtered_df_by_type["name"], key="pokemon_select")
+        if selected_type  in ["Fire", "Poison", "Electric", "Fighting", "Dragon"]:
+            theme_2 = "#FFA78C"
+        elif selected_type in ["Water", "Dragon", "Steel"]:
+            theme_2 = "#D4F1F9"
+        elif selected_type in ["Grass", "Ice", "Fairy", "Ghost"]:
+            theme_2 = "#E7F4D3"
+        elif selected_type in ["Bug", "Normal", "Dark", "Ground", "Psychic", "Rock"]:
+            theme_2 = "#F1D5AA"
+
+
         contender2 = selected_pokemon
 
-        # Fetch the Pokemon data from the API
-        pokeapi_url = f"https://pokeapi.co/api/v2/pokemon/{selected_pokemon.lower()}"
-        response = requests.get(pokeapi_url)
-        if response.status_code == 200:
-            pokemon_data = response.json()
-            # Use PokeSprites API for higher resolution images
-            pokemon_image_url = f"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/{pokemon_data['id']}.png"
-            pokemon_name = pokemon_data["name"]
+        get_pokemon_details(contender2, theme_2, winner)
+        return contender2
 
-            selected_pokemon_data["Contender 2"]["name"] = selected_pokemon.lower()
-            selected_pokemon_data["Contender 2"]["image_url"] = pokemon_image_url
-            # Display the Pokemon image and stats
-            # image_column, stats_column, image_column = st.columns((1, 2))
+contender2 = right_side("nowinner")
 
-            # Check if the higher resolution image is available
-            response_image_high_res = requests.get(pokemon_image_url)
-            if response_image_high_res.status_code == 200:
-                # with image_column:
-                st.markdown(f"<h1 style='text-align: center;'>{pokemon_name.upper()}</h1>", unsafe_allow_html=True)
-                image = Image.open(BytesIO(response_image_high_res.content))
-                st.image(image, use_column_width=True)
-            else:
-                # If higher resolution image is not available, use the other API with lower resolution
-                pokemon_image_url_low_res = pokemon_data["sprites"]["front_default"]
-                # with image_column:
-                st.markdown(f"<h1 style='text-align: center;'>{pokemon_name.upper()}</h1>", unsafe_allow_html=True)
-                response_image_low_res = requests.get(pokemon_image_url_low_res)
-                image_low_res = Image.open(BytesIO(response_image_low_res.content))
-                st.image(image_low_res, use_column_width=True, caption="Sorry for the image quality")
 
-            stats = {
-                "Name": pokemon_name,
-                "Generation": df.loc[df["name"] == selected_pokemon, "generation"].values[0],
-                "Type": df.loc[df["name"] == selected_pokemon, "type_1"].values[0],
-                "Attack": pokemon_data["stats"][4]["base_stat"],
-                "Defense": pokemon_data["stats"][3]["base_stat"],
-                "Total Points": sum(stat["base_stat"] for stat in pokemon_data["stats"]),
-                "Catch Rate": df.loc[df["name"] == selected_pokemon, "catch_rate"].values[0],
-            }
-            # Convert the stats dictionary to a DataFrame with two columns
-            stats_df = pd.DataFrame.from_dict(stats, orient='index', columns=["Value"])
-            # Adjust the table size to make it slimmer and remove the header row
-            st.table(stats_df.style.set_table_styles([
-                dict(selector="thead", props=[("display", "none")]),
-                dict(selector="th", props=[("max-width", "30px")]),
-                dict(selector="td", props=[("padding", "2px")])  # Increase row spacing
 
-            ]))
-            st.markdown(catch_rate_phrase(pokemon_name))
+with bg_1_2:
+    game_space1, game_1_1, game_space2, = st.columns(
+        (0.135, 0.5, 0.01)
+    )
 
-        else:
-            st.warning("Pokemon not found in the API.")
-            st.text("Just Enjoy some stats of this pokemon.")
-            stats = {
-                "Name": pokemon_name,
-                "Generation": df.loc[df["name"] == selected_pokemon, "generation"].values[0],
-                "Type": df.loc[df["name"] == selected_pokemon, "type_1"].values[0],
-                "Attack": pokemon_data["stats"][4]["base_stat"],
-                "Defense": pokemon_data["stats"][3]["base_stat"],
-                "Total Points": sum(stat["base_stat"] for stat in pokemon_data["stats"]),
-                "Catch Rate": df.loc[df["name"] == selected_pokemon, "catch_rate"].values[0],
-            }
-            # Convert the stats dictionary to a DataFrame with two columns
-            stats_df = pd.DataFrame.from_dict(stats, orient='index', columns=["Value"])
-            # Adjust the table size to make it slimmer and remove the header row
-            st.table(stats_df.style.set_table_styles([
-                dict(selector="thead", props=[("display", "none")]),
-                dict(selector="th", props=[("max-width", "30px")]),
-                dict(selector="td", props=[("padding", "2px")])  # Increase row spacing
 
-            ]))
-            st.markdown(catch_rate_phrase(pokemon_name))
 
-    with bg_1_2:
-        # Load the button image
+    with game_1_1:
+        st.header("")
+        st.header("")
+        st.header("")
+        st.header("")
+        st.header("")
+        st.header("")
+        st.header("")
+        st.header("")
+        st.header("")
+        st.header("")
+        st.header("")
+
+        # Center-aligned button with image
         button_image_path = "Pokeviz/bin/images/Poke_Ball.webp"
         button_image = Image.open(button_image_path)
         # Reduce the image size to improve loading time
-        button_image.thumbnail((180, 200))  # Adjust the size as needed
+        button_image.thumbnail((300, 300))  # Adjust the size as needed
 
-        st.header("")
-        st.header("")
-        st.header("")
-        st.header("")
-        st.header("")
-        st.header("")
-        st.header("")
-        st.header("")
-        st.header("")
-        st.header("")
-        st.header("")
+        # image_width = 500  # Adjust the width as needed
+        # st.markdown(
+        #     f"<div style='display: flex; justify-content: center;'>"
+        #     f"<img src='data:image/png;base64,{base64.b64encode(button_image.read()).decode()}' "
+        #     f"style='width: 100%; max-width: {image_width}px;'>"
+        #     f"</div>",
+        #     unsafe_allow_html=True
+        # )
 
-        # Button to open the link
-        if st.image(button_image, use_column_width=True):
-            link = "https://pvpoke.com/train/"
-            if st.button('Start Battle'):
-                # Example battle simulation
-                battle_log, winner = simulate_turn_based_battle(contender1, contender2)
+        st.markdown(
+            f"<img src='data:image/png;justify-content: center; base64,{image_to_base64(button_image)}' alt='pokeball' style='width: 100%; max-width: 300px;'>",
+            unsafe_allow_html=True)
 
-                for log in battle_log:
-                    st.markdown(log)
-                    # st.markdown("![Alt Text](https://media.giphy.com/media/dzIrXQiyqgsSbGGpZR/giphy.gif)")
-                    time.sleep(1.0)
-                if winner:
-                    # Determine the loser based on the winner
-                    loser_pokemon = contender1 if winner == contender2 else contender2
-                    loser_pokemon_name = loser_pokemon.lower()
-                    pokeapi_url = f"https://pokeapi.co/api/v2/pokemon/{loser_pokemon_name}"
-                    response = requests.get(pokeapi_url)
+        st.markdown(
+            "<p style='color: rgba(0, 0, 0, 0.5); font-size: 0.6vw; text-align: left;'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Click to start the battle</p>",
+            unsafe_allow_html=True
+        )
+        st.markdown("")
 
-                    if response.status_code == 200:
-                        loser_pokemon_data = response.json()
-                        loser_pokemon_image_url = f"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/{loser_pokemon_data['id']}.png"
+    bt_space1, bt_1_1, bt_space2, = st.columns(
+        (0.20, 0.3, 0.01)
+    )
 
-                        # Store the loser Pokemon data
-                        selected_pokemon_data[loser_pokemon_name] = {
-                            "data": loser_pokemon_data,
-                            "image_url": loser_pokemon_image_url
-                        }
+    battle_log=''
+    winner=''
+    with bt_1_1:
+        if st.button('Start Battle'):
+            # Example battle simulation
+            battle_log, winner = simulate_turn_based_battle(contender1, contender2)
+            st.header("")
+            st.header("")
+            st.header("")
+            st.header("")
 
-                        # Display the loser's black and white image
-                        loser_bw_image = convert_to_black_and_white(loser_pokemon_image_url)
-                        st.markdown(f"**Loser: {loser_pokemon}**")
-                        st.image(loser_bw_image, use_column_width=True)
-                else:
-                    st.markdown("\nIt's a tie!")
+    for log in battle_log:
+        st.markdown(
+            f"<p style='text-align: center; font-size: 0.6vw;'>{log}</p>",
+            unsafe_allow_html=True
+        )
+        time.sleep(1.0)
+
+    if winner != '':
+        st.markdown(
+            f"<p style='text-align: center; font-size: 1.7vw; font-weight: bold; color: red; margin-bottom: 5px;'>{winner}</p>",
+            unsafe_allow_html=True
+        )
+        st.markdown(
+            f"<p style='text-align: center; font-size: 1.5vwpx;'>  Wins the battle!🏆</p>",
+            unsafe_allow_html=True
+        )
+
+
+        # if winner == contender1:
+        #     left_side("yes")
+        #     right_side("no")
+        # else:
+        #     left_side("no")
+        #     right_side("yes")
+    elif winner == '':
+        print("")
+
+    else:
+        st.markdown("\nIt's a tie!")
+    st.markdown("</div>", unsafe_allow_html=True)
