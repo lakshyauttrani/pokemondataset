@@ -23,43 +23,71 @@ def get_generation_name(generation):
 
 
 def display_tab(df, df2, color_theme):
-
-
     # Create two columns for filters
-    filter_column1, filter_column2, filter_column3 = st.columns(3)
+    space1, bgr_column1, space2, bgr_column2, space3, bgr_column3, space4, bgr_column4, space5= st.columns((0.0001,0.5,0.05,0.5,0.05,0.5,0.05,0.5,0.1))
 
     # Filter by Generation
-    selected_generation = filter_column1.selectbox("Select a Generation", df["generation"].unique())
+    default_generation = 1
+    selected_generation = bgr_column1.selectbox("Generation", df["generation"].unique(),
+                                                key="generation")
 
     # Filter by Type based on selected Generation
     filtered_df_by_generation = df[df["generation"] == selected_generation]
-    selected_type = filter_column2.selectbox("Select a Type", filtered_df_by_generation["type_1"].unique())
+    default_status = 'Normal'
+    selected_status = bgr_column2.selectbox("Select Status", filtered_df_by_generation["status"].unique(),
+                                            index=filtered_df_by_generation["status"].unique().tolist().index(
+                                                default_status),
+                                            key="status")
+
+    # Filter by Type based on selected Generation
+    filtered_df_by_generation = df[df["status"] == selected_status]
+    default_type = 'Electric'
+    unique_types = filtered_df_by_generation["type_1"].unique().tolist()
+
+    if default_type in unique_types:
+        default_type_index = unique_types.index(default_type)
+    else:
+        default_type_index = 0
+
+    selected_type = bgr_column3.selectbox("Select a Type", unique_types, index=default_type_index, key="type")
 
     # Filter by Name based on selected Generation and Type
     filtered_df_by_type = filtered_df_by_generation[filtered_df_by_generation["type_1"] == selected_type]
-    selected_pokemon = filter_column3.selectbox("Select a Pokemon", filtered_df_by_type["name"])
+
+    selected_pokemon = bgr_column4.selectbox("Select a Pokemon", filtered_df_by_type["name"], key="pokemon")
 
 
-    if selected_type  in ["Fire", "Poison", "Electric", "Fighting", "Dragon"]:
-        theme = "#FFA78C"
-    elif selected_type in ["Water", "Dragon", "Steel"]:
+    if selected_type  in ["Fire", "Poison", "Fighting", "Dragon"]:
+        theme = "#ff9a00"
+    elif selected_type in ["Electric"]:
+        theme = "#FFDB01"
+    elif selected_type in ["Water", "Ice", "Steel", "Fairy"]:
         theme = "#D4F1F9"
-    elif selected_type in ["Grass", "Ice", "Fairy", "Ghost"]:
+    elif selected_type in ["Grass", "Ghost"]:
         theme = "#E7F4D3"
-    elif selected_type in ["Bug", "Normal", "Dark", "Ground", "Phychic", "Rock"]:
+    elif selected_type in ["Bug", "Normal", "Dark", "Ground", "Psychic", "Rock"]:
         theme = "#F1D5AA"
+    else:
+        theme = "#ff9a00"
 
 
 
     # Display the Pokemon image and stats
     image_column, stats_column = st.columns((1, 2))
-    kyp_space1, image_column, kyp_space2, stats_column, kyp_space3 = st.columns((0.1, 0.5, 0.1, 0.7, 0.1))
+    kyp_space1, image_column, kyp_space2, stats_column, kyp_space3 = st.columns((0.05, 0.5, 0.1, 0.7, 0.1))
 
     desc_column, graph_column = st.columns((1, 2))
-    kyp2_space1, desc_column, kyp2_space2, graph_column, kyp2_space3 = st.columns((0.1, 0.5, 0.1, 0.7, 0.1))
+    kyp2_space1, desc_column, kyp2_space2, graph_column, kyp2_space3 = st.columns((0.05, 0.5, 0.1, 0.7, 0.1))
 
     # Fetch the Pokemon data from the API
-    pokeapi_url = f"https://pokeapi.co/api/v2/pokemon/{selected_pokemon.lower()}"
+    if " " in selected_pokemon:
+        parts = selected_pokemon.split(" ")
+        api_name = f"{parts[1]}-{parts[0]}"
+    else:
+        api_name = selected_pokemon
+
+
+    pokeapi_url = f"https://pokeapi.co/api/v2/pokemon/{api_name.lower()}"
     response = requests.get(pokeapi_url)
     pokemon_data = None
 
@@ -116,7 +144,7 @@ def display_tab(df, df2, color_theme):
 
     else:
         pokemon_name = selected_pokemon  # Set a default name
-        local_image_path = "Pokeviz/bin/images/pokemon_image_nf.jpg"
+        local_image_path = "/Users/ksmaurya/Documents/AnalyticonViz/Pokeviz/bin/images/pokemon_image_nf.jpg"
         with image_column:
             st.markdown(f"<h1 style='text-align: center;'>{pokemon_name.upper()}</h1>", unsafe_allow_html=True)
             local_image = Image.open(local_image_path)
@@ -124,7 +152,15 @@ def display_tab(df, df2, color_theme):
             max_image_width = 500
             max_image_height = 500
             local_image.thumbnail((max_image_width, max_image_height))
-            st.image(local_image, use_column_width=True, caption=f"Sorry but I cannot find an image of {(pokemon_name)}")
+            st.markdown(
+                f"<div style='display: flex; justify-content: center;'>"
+                f"<img src='data:image/png;base64,{image_to_base64(local_image)}' alt='{pokemon_name}' style='width: 750px;'>"
+                "</div>",
+                unsafe_allow_html=True
+            )
+
+            st.markdown(f"<p style='text-align: center; font-size: 22px;'>Sorry but I cannot find an image of {(pokemon_name)}</p>",
+                        unsafe_allow_html=True)
 
 
     with stats_column:
@@ -174,77 +210,52 @@ def display_tab(df, df2, color_theme):
         # Display the table using Streamlit's st.table
         st.table(stats_df.style.set_table_styles([
             {"selector": "th",
-             "props": [("background-color", f"{theme}"), ("color", "#333"), ("font-weight", "bold")]},
+             "props": [("background-color", f"{theme}"), ("color", "#333"), ("font-weight", "bold"),
+                       ("font-size", "17px")]},
             {"selector": "td",
-             "props": [("border", f"1px solid {theme}"), ("padding", "10px 12px"), ("text-align", "left")]},
+             "props": [("border", f"1px solid {theme}"), ("padding", "10px 32px"), ("text-align", "left")]},
             {"selector": "thead",
              "props": [("display", "none")]}
         ]))
 
+    if pokemon_data:
+        with graph_column:
+            # Generate radar chart
+            radar_data = {
+                "Stats": ["Attack", "Defense", "Special Attack", "Special Defense", "Speed", "HP"],
+                "Values": [
+                    df.loc[df["name"] == selected_pokemon, "attack"].values[0],
+                    df.loc[df["name"] == selected_pokemon, "defense"].values[0],
+                    df.loc[df["name"] == selected_pokemon, "sp_attack"].values[0],
+                    df.loc[df["name"] == selected_pokemon, "sp_defense"].values[0],
+                    df.loc[df["name"] == selected_pokemon, "speed"].values[0],
+                    df.loc[df["name"] == selected_pokemon, "hp"].values[0],
+                ],
+            }
 
+            radar_df = pd.DataFrame(radar_data)
 
+            radar_fig = px.line_polar(radar_df, r="Values", theta="Stats", line_close=True)
+            radar_fig.update_traces(fill="toself", line_color=theme)
 
+            # Customize radar chart layout
+            radar_fig.update_layout(
+                polar=dict(
+                    radialaxis=dict(showticklabels=False, ticksuffix="%", showline=False),
+                    angularaxis=dict(showticklabels=True, linecolor="gray"),
+                ),
+                showlegend=True,  # Display legend
+                legend=dict(x=0.9, y=0.9),  # Adjust legend position
+                title=dict(text="Pokémon Base Stats Profile", x=0.5, xanchor="center", y=0.001,
+                           font=dict(size=24)),  # Adjust title position and margin
+                paper_bgcolor="rgba(0,0,0,0)",  # Transparent background
+                plot_bgcolor="rgba(0,0,0,0)",  # Transparent plot area
+                margin=dict(l=0, r=0, b=50, t=50),  # Adjust margin
+            )
 
+            # Display radar chart
+            st.plotly_chart(radar_fig)
 
-    with graph_column:
-        # Generate radar chart
-        radar_data = {
-            "Stats": ["Attack", "Defense", "Special Attack", "Special Defense", "Speed", "HP"],
-            "Values": [
-                df.loc[df["name"] == selected_pokemon, "attack"].values[0],
-                df.loc[df["name"] == selected_pokemon, "defense"].values[0],
-                df.loc[df["name"] == selected_pokemon, "sp_attack"].values[0],
-                df.loc[df["name"] == selected_pokemon, "sp_defense"].values[0],
-                df.loc[df["name"] == selected_pokemon, "speed"].values[0],
-                df.loc[df["name"] == selected_pokemon, "hp"].values[0],
-            ],
-        }
-
-        radar_df = pd.DataFrame(radar_data)
-
-        radar_fig = px.line_polar(radar_df, r="Values", theta="Stats", line_close=True)
-        radar_fig.update_traces(fill="toself", line_color=theme)
-
-        # Customize radar chart layout
-        radar_fig.update_layout(
-            polar=dict(
-                radialaxis=dict(showticklabels=False, ticksuffix="%", showline=False),
-                angularaxis=dict(showticklabels=True, linecolor="gray"),
-            ),
-            showlegend=True,  # Display legend
-            legend=dict(x=0.9, y=0.9),  # Adjust legend position
-            title=dict(text="Pokémon Base Stats Profile", x=0.5, xanchor="center", y=0.001,
-                       font=dict(size=24)),  # Adjust title position and margin
-            paper_bgcolor="rgba(0,0,0,0)",  # Transparent background
-            plot_bgcolor="rgba(0,0,0,0)",  # Transparent plot area
-            margin=dict(l=0, r=0, b=50, t=50),  # Adjust margin
-        )
-
-        # Display radar chart
-        st.plotly_chart(radar_fig)
-
-        def get_pokemon_cry(pokemon_name):
-            base_url = "https://www.pkmnapi.com/api/v1/pokemon"
-            response = requests.get(f"{base_url}/{pokemon_name}/cry")
-
-            if response.status_code == 200:
-                cry_data = response.json()
-                cry_url = cry_data['sound']
-                return cry_url
-            else:
-                return None
-
-        st.title("Pokemon Cry Player")
-        pokemon_name = selected_pokemon
-
-        if st.button("Play Cry"):
-            cry_url = get_pokemon_cry(pokemon_name)
-            if cry_url:
-                cry_audio = AudioSegment.from_file(cry_url)
-                play(cry_audio)
-                st.success(f"Playing cry for {pokemon_name}")
-            else:
-                st.error(f"Failed to retrieve cry for {pokemon_name}")
 
 
 

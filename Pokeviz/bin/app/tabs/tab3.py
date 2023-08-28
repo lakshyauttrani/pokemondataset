@@ -7,8 +7,15 @@ import plotly.express as px
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+import plotly.graph_objects as go
 
 def display_tab(df, df2, color_theme):
+
+    color1 = color_theme[0]
+    color2 = color_theme[1]
+    color3 = color_theme[2]
+    color4 = color_theme[3]
+    color5 = color_theme[4]
 
     # Data for the first graph - Scatter plot
     data_1 = df  # Sample 10 random Pokemon for illustration
@@ -39,13 +46,26 @@ def display_tab(df, df2, color_theme):
     # First row, first graph: Scatter plot
     with col1:
         # Create a Plotly scatter plot
-        fig = px.scatter(data_1, x='attack', y='defense', color='generation', color_continuous_scale='sunset',
+        if color1 == "#FF6F00":
+            color = 'reds'
+        elif color1 == "#00b4d8":
+            color = 'teal'
+        elif color1 == "#8BC34A":
+            color = 'greens'
+        elif color1 == "#8B4513":
+            color = 'earth'
+        else :
+            color = 'red'
+
+        fig = px.scatter(data_1, x='attack', y='defense', color='generation', color_continuous_scale=color,
                          title="Attack vs Defense of Pokemon",
                          labels={'attack': 'Attack', 'defense': 'Defense'},
                          width=800, height=600)  # Adjust size of the plot
+
         # Customize the plot appearance
         fig.update_layout(
             title="Attack vs Defense of Pokemon",
+            title_font=dict(size=28),  # Adjust title font size
             xaxis_title="Attack",
             yaxis_title="Defense",
             showlegend=True,
@@ -66,32 +86,41 @@ def display_tab(df, df2, color_theme):
         )
 
         # Display the Plotly figure using st.plotly_chart()
-        st.plotly_chart(fig)
+        st.plotly_chart(fig, use_container_width=True)
 
-        narrative = """
-        <div style="font-size: 18px; line-height: 1.6; color: #333;">
-            <p style="margin-bottom: 16px;">Step into the <strong>captivating</strong> world of <strong>Pokémon</strong>, where each creature boasts <strong>unique</strong> strengths and defenses. The scatter plot above <strong>showcases</strong> the <strong>dynamic interplay</strong> between a Pokémon's <strong>attack</strong> and <strong>defense stats</strong>, with each point representing a <strong>randomly selected</strong> creature from various generations. The <strong>vibrant hues</strong> depict the <strong>generation</strong> of each Pokémon, adding a touch of <strong>visual delight</strong>.</p>
-            <p style="margin-bottom: 16px;">As we <strong>navigate through</strong> this <strong>enchanting realm</strong>, it's <strong>fascinating</strong> to <strong>observe</strong> the <strong>wide range</strong> of <strong>attack</strong> and <strong>defense values</strong> exhibited by different species. From the <strong>formidable</strong> to the <strong>nimble</strong>, the plot offers a <strong>glimpse into the diverse attributes</strong> that trainers consider when <strong>crafting their teams and strategies</strong>.</p>
-            <p style="margin-bottom: 16px;">Whether it's the <strong>powerhouse punches</strong> of <strong>Machamp</strong> or the <strong>steadfast defenses</strong> of <strong>Steelix</strong>, each Pokémon contributes a <strong>unique flavor</strong> to battles and adventures. So, <strong>venture forth</strong> and <strong>uncover the secrets</strong> behind these <strong>statistical nuances</strong>, and <strong>embrace the journey</strong> of <strong>becoming a Pokémon Master</strong>.</p>
-        </div>
-        """
 
-        st.write(narrative, unsafe_allow_html=True)
-        st.header("")
+        description = """
+                 <div style="font-size: 22px; line-height: 1.6; ">
+                     <p style="margin-bottom: 16px;">The scatter plot captures the interplay between a Pokémon's attack and defense attributes across generations. Color-coded by generation, this dynamic visualization helps identify trends and variations. If you're exploring offensive-defense dynamics, explore this plot for insights into how attributes evolve across generations.
+                     </p></div>
+                 """
+
+        st.write(description, unsafe_allow_html=True)
 
     # First row, second graph: Bar plot
     with col2:
         st.subheader("")
-        st.write("**Distribution of Pokemon across generations.**")
+        st.markdown("<div style='font-size: 28px; font-weight: bold; text-align: left;'>Distribution of Pokemon across Generations</div>", unsafe_allow_html=True)
 
-        # Create a Plotly bar chart
+
+
+
+
+        st.subheader("")
+
+        color_map = color1
+
         fig = px.bar(bar_data, x="Generation", y="Count", color="Generation")
 
-        # Customize the size and color of the chart
+        # Customize the color of the chart using the color_map
+        fig.update_traces(marker=dict(color=color_map))
+
+        # Customize the size of the chart and title
         fig.update_layout(
             width=800,  # Set the width of the chart
             height=500,  # Set the height of the chart
-            colorway=['#FFDB01', '#FFA900', '#FF6F00', '#FF3D00', '#DD2C00', '#A30000', '#4A148C', '#0D47A1'],
+            title="",  # Set the title
+            title_font=dict(size=28),  # Adjust title font size
             coloraxis_colorbar=dict(
                 title='Generation',  # Colorbar title
                 tickvals=[1, 2, 3, 4, 5, 6, 7, 8],  # Adjust tick values
@@ -100,54 +129,112 @@ def display_tab(df, df2, color_theme):
                 thicknessmode="pixels", thickness=20,  # Adjust colorbar thickness
                 yanchor="middle", y=0.5  # Adjust colorbar vertical position
             )
-            # Set custom color palette
         )
 
         # Display the Plotly figure using st.plotly_chart()
-        st.plotly_chart(fig)
+        st.plotly_chart(fig, use_container_width=True)
 
         description = """
-        <div style="font-size: 18px; line-height: 1.6; color: #333;">
-            <p style="margin-bottom: 16px;">Embark on a journey through the diverse generations of Pokémon, each contributing its unique charm and captivating millions of trainers worldwide.
-            Beginning with the <strong style="color: red; font-weight: bold;">first generation</strong>, which introduced us to the enchanting world of Pokémon in <strong>1996</strong>, the franchise has since grown to encompass a total of <strong>8 generations</strong>, each bringing forth a plethora of new species and adventures.
-            As we traverse through the years, witness the evolution of Pokémon designs, types, and abilities. Notably, the <strong>third generation</strong> marked a milestone with <strong>135 new species</strong> and the introduction of abilities, enhancing battle strategies and adding depth to gameplay.</p>
-            <p style="margin-bottom: 16px;">The allure of Pokémon continued to thrive, and by the time the <strong>seventh generation</strong> arrived, trainers were introduced to the captivating region of Alola, along with <strong>81 new species</strong> to discover.
-            In the most recent <strong>eighth generation</strong>, set in the remarkable Galar region, trainers embraced a total of <strong>89 new species</strong>, embarking on new quests and forming bonds with these awe-inspiring creatures.
-            As the Pokémon saga unfolds across generations, one thing remains certain—the enduring magic and unbreakable bond between trainers and their Pokémon.</p>
-        </div>
-        """
-        st.header("")
+                         <div style="font-size: 22px; line-height: 1.6; ">
+                             <p style="margin-bottom: 16px;">The bar chart paints a picture of Pokémon distribution through generations. Each bar's color corresponds to a generation, revealing their relative representation. If you seek to understand the prevalence of Pokémon across eras, examine this chart to grasp the generational landscape and variations in Pokémon count.
+                             </p></div>
+                         """
+
         st.write(description, unsafe_allow_html=True)
-        st.header("")
 
         # Second row, first graph: Area chart
     with col3:
-        st.subheader("Random Pokemon Abilities")
-        st.write("Discover the abilities of randomly selected Pokemon.")
-        data_2_long = data_2[['ability_1', 'ability_2', 'ability_hidden']].melt(var_name='ability_type',
-                                                                                value_name='ability')
 
-        # Create a Matplotlib figure and axis
-        fig, ax = plt.subplots(figsize=(10, 6))
+        def cat_total_points(row):
+            if row.total_points < 300:
+                return 'Weakest'
+            elif (row.total_points >= 300) & (row.total_points < 600):
+                return 'Intermediate'
+            else:
+                return 'Strong'
 
-        # Plot using Seaborn lineplot
-        sns.lineplot(data=data_2_long, x='ability_type', y='ability', palette='viridis', ax=ax)
+        st.subheader("")
+        st.subheader("")
 
-        # Display the Matplotlib figure using st.pyplot()
+        # Create bins on total_points column
+        df['cat_total_points'] = df.apply(cat_total_points, axis='columns')
 
-        st.pyplot(fig)
+        data_to_consider = df[['hp', 'attack', 'defense', 'total_points', 'cat_total_points']].copy()
 
-    # Second row, second graph: Scatter plot with regression line
+        # Drop rows with any missing values
+        data_to_consider = data_to_consider.dropna()
+
+        fig = px.scatter_ternary(data_to_consider,
+                                 a="hp",
+                                 b="attack",
+                                 c="defense",
+                                 color="cat_total_points",
+                                 color_discrete_map={
+                                     'Weakest': color1,
+                                     'Intermediate': color2,
+                                     'Strong': color3
+                                 },
+                                 size="total_points",
+                                 size_max=15)
+
+        fig.update_layout(
+            title="Ternary Plot of Pokemon Attributes",
+            title_font=dict(size=28),
+            ternary=dict(
+                aaxis_title="HP",
+                baxis_title="Attack",
+                caxis_title="Defense"
+            ),
+            width=800,  # Adjust the width of the plot
+            height=600  # Adjust the height of the plot
+        )
+
+        st.plotly_chart(fig, use_container_width=True)
+
+        description1 = """
+         <div style="font-size: 22px; line-height: 1.6; ">
+             <p style="margin-bottom: 16px;">The ternary plot visualizes Pokemon attributes based on health points (HP), attack, and defense. Notably, Pokemon categorized as 'Strong' gather around the center of the plot, indicating a balanced distribution of their offensive and defensive capabilities. On the other hand, 'Weakest' Pokemon tend to cluster near the edges, implying a focus on specific attributes rather than balance.
+             </p></div>
+         """
+
+
+        st.write(description1, unsafe_allow_html=True)
+
+
+
+
+
+
+
     with col4:
-        st.subheader("Attack vs. Defense")
-        st.write("Examining the relationship between attack and defense stats.")
-        plt.figure(figsize=(8, 6))
-        sns.scatterplot(x=x, y=y, color='blue')
-        sns.regplot(x=x, y=y, ci=None, line_kws={"color": "red"})
-        st.pyplot()
+        st.subheader("")
+        df = df[['generation','total_points', 'hp', 'attack', 'defense']]
+        per_gen_pokemon = df.groupby('generation').mean()[['total_points', 'hp', 'attack', 'defense']]
 
-    # Third row: Scatter chart
+        fig = go.Figure()
+        fig.add_trace(go.Bar(x=per_gen_pokemon.index, y=per_gen_pokemon['hp'],
+                             name='Health Points', marker_color=color1))
+        fig.add_trace(go.Bar(x=per_gen_pokemon.index, y=per_gen_pokemon['defense'],
+                             name='Defense', marker_color=color2))
+        fig.add_trace(go.Bar(x=per_gen_pokemon.index, y=per_gen_pokemon['attack'],
+                             name='Attack', marker_color=color3))
+        fig.add_trace(go.Bar(x=per_gen_pokemon.index, y=per_gen_pokemon['total_points'],
+                             name='Total Points', marker_color=color4))
+        fig.update_layout(barmode='stack', title='Generation-wise Aggregated Characteristic Stat Comparison',
+                          title_font=dict(size=28),
+                          height=620
+                          )
 
+        # Display the Plotly figure using st.plotly_chart()
+        st.plotly_chart(fig, use_container_width=True)
+
+        description1 = f"""
+             <div style="font-size: 22px; line-height: 1.6; ">
+                 <p style="margin-bottom: 16px;">If we consider Pokémon base points as a primary indicator of their overall strength, the seventh generation emerges as the most powerful. This observation could be attributed to the presence of 30 special Pokémon within this generation. The graph depicts a comparison between the ranking of total points across generations and the count of special Pokémon within each generation.
+                 </p></div>
+             """
+
+        st.write(description1, unsafe_allow_html=True)
 
 
 
