@@ -175,8 +175,7 @@ def display_tab(df, df2, color_theme):
                                      'Intermediate': color2,
                                      'Strong': color3
                                  },
-                                 size="total_points",
-                                 size_max=14)
+                                 size="total_points")
 
         fig.update_layout(
             title="Ternary Plot of Pokemon Attributes",
