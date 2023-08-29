@@ -187,6 +187,7 @@ def display_tab(df, df2, color_theme):
             ),
             width=800,  # Adjust the width of the plot
             height=600, # Adjust the height of the plot,
+            margin=dict(l=100, t=100, r=100),  # Add left margin
              legend_title_text='Total  Points'
         )
 
