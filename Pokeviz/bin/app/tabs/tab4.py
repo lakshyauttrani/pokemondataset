@@ -27,7 +27,7 @@ def display_tab(df, df2, color_theme):
     
     description1 = """
          <div style="font-size: 22px; line-height: 1.6; ">
-             <p style="margin-bottom: 16px;">Pokémons come in all different types, each type with its strengths and weaknesses. Choose the perfect type for you, analyse its strengths and see how it compares to other types. Good luck on your future battles!
+             <p style="margin-bottom: 16px;">Pokémon come in various types, each with its own strengths and weaknesses. Find the type that suits you, check out its strengths, and see how it compares to other types. Best of luck in your future battles!
              </p></div>
          """
 
