@@ -121,7 +121,7 @@ with row0_2:
         color5 = "#9A6324"  # Deep Brown
 
         st.markdown(
-            f"<h3 style='text-align: center; background-color: {color1}; padding: 10px; border-radius: 5px; color: #333;'>"
+            f"<h3 style='text-align: center; background-color: {color1}; padding: 10px; border-radius: 5px; font-size: 1.3vw; color: #333;'>"
             f"🔥 Current theme - {selected_option} </h3>",
             unsafe_allow_html=True
         )
@@ -135,7 +135,7 @@ with row0_2:
 
 
         st.markdown(
-            f"<h3 style='text-align: center; background-color: {color2}; padding: 10px; border-radius: 5px; color: #333;'>"
+            f"<h3 style='text-align: center; background-color: {color2}; padding: 10px; border-radius: 5px;font-size: 1.3vw; color: #333;'>"
             f"🌊 Current theme - {selected_option} </h3>",
             unsafe_allow_html=True
         )
@@ -148,7 +148,7 @@ with row0_2:
         color5 =   "#558B2F"# Light Green
 
         st.markdown(
-            f"<h3 style='text-align: center; background-color: {color1}; padding: 10px; border-radius: 5px; color: #333;'>"
+            f"<h3 style='text-align: center; background-color: {color1}; padding: 10px; border-radius: 5px;font-size: 1.3vw; color: #333;'>"
             f"🌿 Current theme - {selected_option} </h3>",
             unsafe_allow_html=True
         )
@@ -163,7 +163,7 @@ with row0_2:
 
 
         st.markdown(
-            f"<h3 style='text-align: center; background-color: {color4}; padding: 10px; border-radius: 5px; color: #333;'>"
+            f"<h3 style='text-align: center; background-color: {color4}; padding: 10px; border-radius: 5px;font-size: 1.3vw; color: #333;'>"
             f"🪨 Current theme - {selected_option} </h3>",
             unsafe_allow_html=True
         )
