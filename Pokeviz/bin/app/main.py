@@ -59,12 +59,12 @@ with row0_1:
     st.header("")
 
     st.markdown(
-        "Immerse yourself in the world of Pokémon with Pokeviz, a dynamic dashboard unveiling a treasure trove of info about these unique creatures. Explore profiles of 1028 Pokémon, from classics to sub-legendaries, on an enlightening journey through generations.Delve into Pokémon intricacies like physical traits and combat prowess. Pokeviz goes beyond stats, diving into abilities, growth rates, and type defenses. Whether Trainer or enthusiast, it guides you through diverse traits. Uncover Pokémon facets with graphs, charts, and visual storytelling at Pokeviz.",
+        "Immerse yourself in the world of Pokémon with Pokéviz, a dynamic dashboard revealing everything you need to know about these unique creatures. Explore the profiles of more than 1000 Pokémons, from classics to sub-legendaries, on an enlightening journey through generations. Pokéviz goes beyond stats, diving into abilities, growth rates, and type defenses. Whether you are a trainer or an apprentice, it will get you ready for your next battle.",
         unsafe_allow_html=True
     )
 
     st.markdown(
-        "Step into a world where data-driven exploration merges with the enchanting realm of Pokémon. Welcome to Pokeviz, your guide to the captivating universe of these incredible creatures.",
+        "Step into a world where data-driven exploration merges with the exciting realm of Pokémon. Best of luck on your journey to catch ’em all!",
         unsafe_allow_html=True
     )
 
@@ -90,7 +90,7 @@ with row0_2:
     )
 
     st.markdown(
-        "<p style='color: rgba(0, 0, 0, 0.5); font-size: 25px; text-align: center;'>Click to explore something fun</p>",
+        "<p style='color: rgba(0, 0, 0, 0.5); font-size: 1vw; text-align: center;'>Click to explore something fun</p>",
         unsafe_allow_html=True
     )
 
@@ -109,7 +109,7 @@ with row0_2:
         color4 = "#FF5733"  # Bold Yellow-Orange
         color5 = "#9A6324"  # Deep Brown
         st.markdown(
-            f"<h3 style='text-align: center; background-color: {color1}; padding: 10px; border-radius: 5px; color: #333;'>"
+            f"<h3 style='text-align: center; background-color: {color1}; padding: 5px; border-radius: 5px; font-size: 1.3vw; color: #333;'>"
             f"🔥 Current theme - Fire - 🔥 </h3>",
             unsafe_allow_html=True
         )
@@ -183,7 +183,7 @@ st.markdown(
     """
     <style>
         .stTabs > div > div > div:nth-child(1) {
-            margin-left: 90px; /* Adjust the value as needed */
+            margin-left: 20px; /* Adjust the value as needed */
         }
     </style>
     """,

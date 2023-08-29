@@ -18,7 +18,7 @@ def display_tab(df, df2, color_theme):
     color5 = color_theme[4]
 
     # Data for the first graph - Scatter plot
-    data_1 = df  # Sample 10 random Pokemon for illustration
+    data_1 = df  
 
     # Data for the second graph - Bar plot
     categories = df['generation'].unique()
@@ -59,7 +59,8 @@ def display_tab(df, df2, color_theme):
 
         fig = px.scatter(data_1, x='attack', y='defense', color='generation', color_continuous_scale=color,
                          title="Attack vs Defense of Pokemon",
-                         labels={'attack': 'Attack', 'defense': 'Defense'},
+                         labels={'attack': 'Attack', 'defense': 'Defense', 'name': 'Name'},
+                         hover_data=["name", "attack", "defense", "generation"], 
                          width=800, height=600)  # Adjust size of the plot
 
         # Customize the plot appearance
@@ -91,7 +92,7 @@ def display_tab(df, df2, color_theme):
 
         description = """
                  <div style="font-size: 22px; line-height: 1.6; ">
-                     <p style="margin-bottom: 16px;">The scatter plot captures the interplay between a Pokémon's attack and defense attributes across generations. Color-coded by generation, this dynamic visualization helps identify trends and variations. If you're exploring offensive-defense dynamics, explore this plot for insights into how attributes evolve across generations.
+                     <p style="margin-bottom: 16px;">The scatter plot captures the interplay between a Pokémon's attack and defense attributes across generations. Color-coded by generation, this dynamic visualization helps identify trends and variations. It’s interesting to see most outliers are from first generations, for example, Shuckle (Gen 2) stands out with an exceptional defense stat of 230, while Mega Heracross (Gen 2) showcases an unusually high attack stat of 185.
                      </p></div>
                  """
 
@@ -136,7 +137,7 @@ def display_tab(df, df2, color_theme):
 
         description = """
                          <div style="font-size: 22px; line-height: 1.6; ">
-                             <p style="margin-bottom: 16px;">The bar chart paints a picture of Pokémon distribution through generations. Each bar's color corresponds to a generation, revealing their relative representation. If you seek to understand the prevalence of Pokémon across eras, examine this chart to grasp the generational landscape and variations in Pokémon count.
+                             <p style="margin-bottom: 16px;">The bar chart depicts the distribution of Pokémon across generations, where each bar's color corresponds to a specific generation. It seems that the peak of Pokémon breeding occurred right at the beginning, with 192 new Pokémon hatching from the first generation.
                              </p></div>
                          """
 
@@ -186,7 +187,8 @@ def display_tab(df, df2, color_theme):
                 caxis_title="Defense"
             ),
             width=800,  # Adjust the width of the plot
-            height=600  # Adjust the height of the plot
+            height=600, # Adjust the height of the plot,
+             legend_title_text='Total  Points'
         )
 
         st.plotly_chart(fig, use_container_width=True)
@@ -208,8 +210,16 @@ def display_tab(df, df2, color_theme):
 
     with col4:
         st.subheader("")
-        df = df[['generation','total_points', 'hp', 'attack', 'defense']]
-        per_gen_pokemon = df.groupby('generation').mean()[['total_points', 'hp', 'attack', 'defense']]
+        df2 = df[['generation','total_points', 'hp', 'attack', 'defense']]
+        per_gen_pokemon = df2.groupby('generation').mean()[['total_points', 'hp', 'attack', 'defense']]
+        
+
+        df3 = df[['generation','total_points', 'hp', 'attack', 'defense', 'status']]
+        # Calculate the number of non-normal status Pokémon per generation
+        legendary_counts = df3[df3['status'] != 'Normal'].groupby('generation')['status'].count()
+
+        # Scale down the legendary counts for better visualization
+        scaled_legendary_counts = legendary_counts * 15
 
         fig = go.Figure()
         fig.add_trace(go.Bar(x=per_gen_pokemon.index, y=per_gen_pokemon['hp'],
@@ -224,6 +234,12 @@ def display_tab(df, df2, color_theme):
                           title_font=dict(size=28),
                           height=620
                           )
+        # Adding a line for the number of legendary Pokémon
+        fig.add_trace(go.Scatter(x=legendary_counts.index, y=scaled_legendary_counts.values,
+                         mode='lines+markers', name='Special Pokémons',
+                         line=dict(color='#333333', width=3),
+                         customdata=legendary_counts.values,
+                         hovertemplate=' %{customdata} Special Pokémons')) 
 
         # Display the Plotly figure using st.plotly_chart()
         st.plotly_chart(fig, use_container_width=True)

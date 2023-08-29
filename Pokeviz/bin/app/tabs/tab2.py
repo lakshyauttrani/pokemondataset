@@ -4,7 +4,6 @@ import requests
 from PIL import Image
 from io import BytesIO
 import plotly.express as px
-from tabulate import tabulate
 import base64
 from io import BytesIO
 import matplotlib.pyplot as plt
@@ -34,7 +33,7 @@ def display_tab(df, df2, color_theme):
     # Filter by Type based on selected Generation
     filtered_df_by_generation = df[df["generation"] == selected_generation]
     default_status = 'Normal'
-    selected_status = bgr_column2.selectbox("Select Status", filtered_df_by_generation["status"].unique(),
+    selected_status = bgr_column2.selectbox("Select Rarity", filtered_df_by_generation["status"].unique(),
                                             index=filtered_df_by_generation["status"].unique().tolist().index(
                                                 default_status),
                                             key="status")

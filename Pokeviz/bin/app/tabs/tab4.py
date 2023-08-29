@@ -24,6 +24,17 @@ def lighten_color(hex_color, factor=0.8):
 
 
 def display_tab(df, df2, color_theme):
+    
+    description1 = """
+         <div style="font-size: 22px; line-height: 1.6; ">
+             <p style="margin-bottom: 16px;">Pokémons come in all different types, each type with its strengths and weaknesses. Choose the perfect type for you, analyse its strengths and see how it compares to other types. Good luck on your future battles!
+             </p></div>
+         """
+
+
+    st.write(description1, unsafe_allow_html=True)
+
+    
     row3_space1, row_3_1, row3_space2, row_3_2, row3_space3 = st.columns(
         (0.001, 1, 0.1, 1, 0.1)
     )
@@ -40,6 +51,9 @@ def display_tab(df, df2, color_theme):
     color4 = color_theme[3]
     color5 = color_theme[4]
 
+    
+    
+    
     with row_3_1:
 
         # Define a color map for the lines
@@ -82,6 +96,9 @@ def display_tab(df, df2, color_theme):
 
     # Filter by Type based on selected Generation
     df_against_type = df[df["type_1"].isin(combined_selected_types)]
+
+
+
 
     with row_3_2:
         # Select attributes for the star chart

@@ -377,7 +377,7 @@ def display_tab():
 
     with bg_1_2:
         game_space1, game_1_1, game_space2, = st.columns(
-            (0.135, 0.5, 0.01)
+            (0.01, 0.5, 0.01)
         )
 
         with game_1_1:
@@ -443,8 +443,21 @@ def display_tab():
             # time.sleep(1.0)
 
         if winner != '':
+            type = df.loc[df['name'] == winner, 'type_1'].iloc[0]
+
+            if type in ["Fire", "Poison", "Electric", "Fighting", "Dragon"]:
+                color = "#FF8750"  # Brighter shade of orange
+            elif type in ["Water", "Dragon", "Steel"]:
+                color = "#6CD9E3"  # Brighter shade of blue
+            elif type in ["Grass", "Ice", "Fairy", "Ghost"]:
+                color = "#8FCA66"  # Brighter shade of green
+            elif type in ["Bug", "Normal", "Dark", "Ground", "Psychic", "Rock"]:
+                color = "#C5936A"  # Slightly darker shade of brown
+
+
+
             st.markdown(
-                f"<p style='text-align: center; font-size: 1.5vw; font-weight: bold; color: red; margin-bottom: 5px;'>{winner}</p>",
+                f"<p style='text-align: center; font-size: 1.5vw; font-weight: bold; color: {(color)}; margin-bottom: 5px;'>{winner}</p>",
                 unsafe_allow_html=True
             )
             st.markdown(

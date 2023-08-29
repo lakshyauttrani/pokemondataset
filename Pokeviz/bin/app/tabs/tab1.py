@@ -76,9 +76,9 @@ def display_tab(df, df2, color_theme):
 
         description1 = """
         <div style="font-size: 22px; line-height: 1.6; ">
-            <p style="margin-bottom: 16px;">Delve into the captivating financial odyssey of Pokémon GO as we unveil its remarkable journey through the years. From its inception in <strong>2016</strong>,the game has generated an astonishing <strong style="color: %s; font-weight: bold;">$830 million</strong> in revenue.
+            <p style="margin-bottom: 16px;">Delve into the captivating financial odyssey of Pokémon GO as we unveil its remarkable journey through the years. From its inception in <strong style="color: %s; font-weight: bold;">2016</strong>, the game has generated an astonishing <strong style="color: %s; font-weight: bold;">$830 million</strong> in revenue.
             </p></div>
-        """ % color5
+        """ % (color5, color5)
 
         description2 = """
         <div style="font-size: 22px; line-height: 1.6; ">
@@ -163,7 +163,7 @@ def display_tab(df, df2, color_theme):
 
         description2_1 = """
         <div style="font-size: 22px; line-height: 1.6; ">
-            <p style="margin-bottom: 16px;">Splash! <strong style="color: %s; font-weight: bold;">Water-type Pokémon</strong> steal the spotlight as the most common characters across generations. From old-time favorites like Squirtle and Gyarados to newer stars like Greninja, whether they're making a splash or simply enjoying aquatic adventures, these water-loving critters add their own special magic to the Pokémon world
+            <p style="margin-bottom: 16px;">Splash! <strong style="color: %s; font-weight: bold;">Water-type Pokémon</strong> steal the spotlight as the most common characters across generations. From old-time favorites like Squirtle and Gyarados to newer stars like Greninja, whether they're making a splash or simply enjoying aquatic adventures, these water-loving critters add their own special magic to the Pokémon world.
             </p></div>
         """ % color5
         st.write(description2_1, unsafe_allow_html=True)
@@ -195,7 +195,7 @@ def display_tab(df, df2, color_theme):
 
     description2_2 = """
         <div style="font-size: 22px; line-height: 1.6; ">
-            <p style="margin-bottom: 16px;"> Discover the ultimate Pokémon types that dominate the battlefield: the sharpest attackers Dragons , the most resilient defenders Steel Pokémons ,the devastating special attackers Psychics, the unbreakable walls of special defense Fairies, and the lightning-fast speeders flying Pokémons.
+            <p style="margin-bottom: 16px;"> Discover the ultimate Pokémon types that dominate the battlefield: the sharpest attackers Dragons, the most resilient defenders Steel Pokémons, the devastating special attackers Psychics, the unbreakable walls of special defense Fairies, and the lightning-fast speeders flying Pokémons.
             </p></div>
         """
     st.write(description2_2, unsafe_allow_html=True)
