@@ -440,7 +440,7 @@ def display_tab():
                 f"<p style='text-align: center; font-size: 0.6vw;'>{log}</p>",
                 unsafe_allow_html=True
             )
-            # time.sleep(1.0)
+            time.sleep(1.0)
 
         if winner != '':
             type = df.loc[df['name'] == winner, 'type_1'].iloc[0]
@@ -457,11 +457,11 @@ def display_tab():
 
 
             st.markdown(
-                f"<p style='text-align: center; font-size: 1.5vw; font-weight: bold; color: {(color)}; margin-bottom: 5px;'>{winner}</p>",
+                f"<p style='text-align: center; font-size: 1.8vw; font-weight: bold; color: {(color)}; margin-bottom: 5px;'>{winner}</p>",
                 unsafe_allow_html=True
             )
             st.markdown(
-                f"<p style='text-align: center; font-size: 1.3vw;'>  Wins the battle!🏆</p>",
+                f"<p style='text-align: center; font-size: 1.2vw;'>  Wins the battle!🏆</p>",
                 unsafe_allow_html=True
             )
 
